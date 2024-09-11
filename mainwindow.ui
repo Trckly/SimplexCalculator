@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QStackedWidget" name="stackedWidget">
+   <widget class="QStackedWidget" name="tablesStackedWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -27,37 +27,111 @@
      <widget class="QTableWidget" name="tableWidget">
       <property name="geometry">
        <rect>
-        <x>-15</x>
-        <y>-39</y>
-        <width>931</width>
+        <x>-60</x>
+        <y>-30</y>
+        <width>1321</width>
         <height>701</height>
        </rect>
       </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="page_2">
-     <widget class="QTableWidget" name="tableWidget_2">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>310</y>
-        <width>256</width>
-        <height>192</height>
-       </rect>
+      <property name="rowCount">
+       <number>3</number>
       </property>
+      <property name="columnCount">
+       <number>5</number>
+      </property>
+      <row/>
+      <row/>
+      <row/>
+      <column/>
+      <column/>
+      <column/>
+      <column/>
+      <column/>
      </widget>
     </widget>
+    <widget class="QWidget" name="page_2"/>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>620</y>
+      <y>590</y>
       <width>1111</width>
       <height>31</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="objectiveFunctionLayout" stretch=""/>
+    <layout class="QHBoxLayout" name="objectiveFunctionLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="maximumSize">
+        <size>
+         <width>110</width>
+         <height>21</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Objective Function:</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QFrame" name="frame">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>630</y>
+      <width>1051</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Shape::Panel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Shadow::Plain</enum>
+    </property>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>1051</width>
+       <height>171</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Constraints:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="constraintVerticalLayout"/>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="calculateButton">
+    <property name="geometry">
+     <rect>
+      <x>1070</x>
+      <y>630</y>
+      <width>51</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Enter</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -66,7 +140,7 @@
      <x>0</x>
      <y>0</y>
      <width>1126</width>
-     <height>37</height>
+     <height>17</height>
     </rect>
    </property>
   </widget>

@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Connecting the button's clicked() signal to a slot (lambda function in this case)
     connect(AddCoefficientButton, &QPushButton::clicked, this, &MainWindow::onAddCoefficientButtonClicked);
 
-    AppendCoefficients(2);
+    AddCoefficients(COEFFICIENTS_COUNT);
 }
 
 MainWindow::~MainWindow()
@@ -35,30 +35,53 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+// In any line edit that is empty it automatically asumes there is supposed to be zero.
+// Returns first found invalid input line edit
+QLineEdit* MainWindow::ReadAllInputs()
+{
+    QVector<float> objFuncCoefficients;
+    for (int i = 0; i < ObjFuncLineEditList.count(); ++i){
+        if(ObjFuncLineEditList[i]->text().isEmpty()){
+            ObjFuncLineEditList[i]->setText("0");
+        }
+
+        bool ok;
+        float temp = ObjFuncLineEditList[i]->text().toFloat(&ok);
+        if(!ok){
+            return ObjFuncLineEditList[i];
+        }
+        objFuncCoefficients.append(temp);
+
+        qDebug() << temp << " ";
+    }
+
+    return nullptr;
+}
+
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     {
         // Left Arrow Key: Switch to the previous table
         if (event->key() == Qt::Key_Left) {
-            int currentIndex = ui->stackedWidget->currentIndex();
-            int previousIndex = (currentIndex - 1 + ui->stackedWidget->count()) % ui->stackedWidget->count();
-            ui->stackedWidget->setCurrentIndex(previousIndex);
+            int currentIndex = ui->tablesStackedWidget->currentIndex();
+            int previousIndex = (currentIndex - 1 + ui->tablesStackedWidget->count()) % ui->tablesStackedWidget->count();
+            ui->tablesStackedWidget->setCurrentIndex(previousIndex);
         }
         // Right Arrow Key: Switch to the next table
         else if (event->key() == Qt::Key_Right) {
-            int currentIndex = ui->stackedWidget->currentIndex();
-            int nextIndex = (currentIndex + 1) % ui->stackedWidget->count();
-            ui->stackedWidget->setCurrentIndex(nextIndex);
+            int currentIndex = ui->tablesStackedWidget->currentIndex();
+            int nextIndex = (currentIndex + 1) % ui->tablesStackedWidget->count();
+            ui->tablesStackedWidget->setCurrentIndex(nextIndex);
         }
     }
 }
 
 void MainWindow::onAddCoefficientButtonClicked()
 {
-    AppendCoefficients(1);
+    AppendConstraint();
 }
 
-void MainWindow::AppendCoefficients(int numToAdd)
+void MainWindow::AddCoefficients(int numToAdd)
 {
     int count = 1;
     for (int i = 0; i < numToAdd; ++i){
@@ -81,12 +104,49 @@ void MainWindow::AppendCoefficients(int numToAdd)
     }
 }
 
-int MainWindow::countQLineEdits(const QList<QObject*> &children) {
-    int count = 0;
-    for (QObject *child : children) {
-        if (qobject_cast<QLineEdit*>(child)) {
-            ++count;
+void MainWindow::AppendConstraint()
+{
+    QRect parentRect = ui->constraintVerticalLayout->geometry();
+
+    QHBoxLayout* HBoxLayout = new QHBoxLayout();
+    HBoxLayout->setGeometry(QRect(parentRect.topLeft(), QSize(parentRect.width(), 21)));
+    ui->constraintVerticalLayout->addLayout(HBoxLayout);
+
+    // ConstraintsLineEditMatrix.append(QVector<QLineEdit*>());
+
+    QVector<QLineEdit*> currentConstraintLineEditList;
+    int count = 1;
+    for (int i = 0; i < COEFFICIENTS_COUNT; ++i){
+        QLineEdit* LineEdit = new QLineEdit(this);
+        LineEdit->setFixedSize(BOX_WIDTH, BOX_HEIGHT);
+        currentConstraintLineEditList.append(LineEdit);
+
+        QLabel* label = new QLabel;
+        QString str;
+        if(i != COEFFICIENTS_COUNT - 1){
+            str = "x_" + QString::number(count++) + " + ";
+            label->setFixedWidth(BOX_WIDTH + 8);
         }
+        else{
+            str = "x_" + QString::number(count);
+        }
+        label->setText(str);
+        HBoxLayout->addWidget(LineEdit);
+        HBoxLayout->addWidget(label);
     }
-    return count;
+    ConstraintsLineEditMatrix.append(currentConstraintLineEditList);
 }
+
+void MainWindow::on_calculateButton_clicked()
+{
+    if(prevFalseLineEdit){
+        prevFalseLineEdit->setStyleSheet("");
+    }
+
+    if(QLineEdit* falseLineEdit = ReadAllInputs()){
+        prevFalseLineEdit = falseLineEdit;
+        prevFalseLineEdit->setStyleSheet("QLineEdit { background-color: red; }");
+        return;
+    }
+}
+

@@ -10,6 +10,7 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QLabel>
+#include "simplexclass.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -24,22 +25,37 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    int countQLineEdits(const QList<QObject*> &children);
+
+    QLineEdit *ReadAllInputs();
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
 
     void onAddCoefficientButtonClicked();
 
-    void AppendCoefficients(int numToAdd);
+    void AddCoefficients(int numToAdd);
+
+    void AppendConstraint();
 
 private slots:
+
+    void on_calculateButton_clicked();
 
 private:
     Ui::MainWindow *ui;
 
     const int BOX_WIDTH = 25, BOX_HEIGHT = 21;
 
+    const int COEFFICIENTS_COUNT = 4;
+
     QPushButton* AddCoefficientButton;
+
+    QVector<QLineEdit*> ObjFuncLineEditList;
+
+    QVector<QVector<QLineEdit*>> ConstraintsLineEditMatrix;
+
+    SimplexClass* SimplexData = nullptr;
+
+    QLineEdit* prevFalseLineEdit = nullptr;
 };
 #endif // MAINWINDOW_H
