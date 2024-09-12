@@ -88,18 +88,25 @@ QVector<QTableWidget *> SimplexClass::BuildTables()
     QVector<QTableWidget*> tables;
     QPoint tableDimentions = CalculateTableDimentions();
 
-    bool stop = false;
-    for(int i = 0; !stop; ++i){
-        if(QTableWidget* table = ConstructTable(tableDimentions)){
-            tables.append(table);
-            stop = true;
-        }
-        else {
-            qDebug() << "Error with construction of table template!";
-        }
-    }
+    if(QTableWidget* table = ConstructTable(tableDimentions)){
+        tables.append(table);
 
-    return tables;
+        while(true){
+            bool quit = SimplexAlgorithm();
+
+            if(QTableWidget* table = ConstructTable(tableDimentions)){
+                tables.append(table);
+                if(quit){
+                    break;
+                }
+            }
+            else {
+                qDebug() << "Error with construction of table template!";
+            }
+        }
+
+        return tables;
+    }
 }
 
 QPoint SimplexClass::CalculateTableDimentions()
@@ -185,5 +192,55 @@ QTableWidget *SimplexClass::ConstructTable(QPoint Dimentions)
 
 bool SimplexClass::SimplexAlgorithm()
 {
-    return 1;
+    bool quit = false;
+
+    int minColIndex = GetMinColumnIndex();
+
+    int minRowIndex = GetMinRowIndex(minColIndex);
+
+    for (int i = 0; i < constrCoeffMatrix.count(); ++i){
+        for (int j = 0; j < constrCoeffMatrix[0].count(); ++j){
+
+        }
+    }
+}
+
+int SimplexClass::GetMinColumnIndex(float *minValue)
+{
+    float min = 0;
+    int minIndex = 0;
+    for (int i = 0; i < lastRow.count(); ++i){
+        if(i == 0){
+            min = lastRow[i];
+            minIndex = i;
+            continue;
+        }
+        if(lastRow[i] < min){
+            min = lastRow[i];
+            minIndex = i;
+        }
+    }
+    *minValue = min;
+    return minIndex;
+}
+
+int SimplexClass::GetMinRowIndex(int colIndex, float *minValue)
+{
+    float min = 0, temp;
+    int minIndex = 0;
+    for (int i = 0; i < constrCoeffMatrix.count(); ++i){
+        if(constrCoeffMatrix[i][colIndex] > 0){
+            temp = plans[i] / constrCoeffMatrix[i][colIndex];
+            if(i == 0){
+                min = plans[i];
+                minIndex = i;
+            }
+            if(plans[i] < min){
+                min = plans[i];
+                minIndex = i;
+            }
+        }
+    }
+    *minValue = min;
+    return minIndex;
 }

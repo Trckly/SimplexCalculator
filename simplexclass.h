@@ -47,5 +47,9 @@ public:
 
     bool SimplexAlgorithm();
 
+    int GetMinColumnIndex(float *minValue = nullptr);
+
+    int GetMinRowIndex(int colIndex, float *minValue = nullptr);
+
 signals:
 };
