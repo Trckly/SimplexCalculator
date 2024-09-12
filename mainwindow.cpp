@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     // Find the QStackedWidget (assuming it is named 'stackedWidget' in your .ui file)
-    QStackedWidget *stackedWidget = findChild<QStackedWidget*>("stackedWidget");
+    QStackedWidget *stackedWidget = findChild<QStackedWidget*>("tablesStackedWidget");
 
     if (stackedWidget) {
         // Remove all pages
@@ -51,9 +51,40 @@ QLineEdit* MainWindow::ReadAllInputs()
             return ObjFuncLineEditList[i];
         }
         objFuncCoefficients.append(temp);
-
-        qDebug() << temp << " ";
     }
+
+    QVector<QVector<float>> constraintsCoefficients;
+    QVector<float> plans;
+    for(int i = 0; i < ConstraintsLineEditMatrix.count(); ++i){
+        QVector<float> row;
+
+        if(planLineEditVect[i]->text().isEmpty()){
+            planLineEditVect[i]->setText("0");
+        }
+
+        bool k;
+        float t = planLineEditVect[i]->text().toFloat(&k);
+        if(!k){
+            return planLineEditVect[i];
+        }
+        plans.append(t);
+
+        for(int j = 0; j < ConstraintsLineEditMatrix[i].count(); ++j){
+            if(ConstraintsLineEditMatrix[i][j]->text().isEmpty()){
+                ConstraintsLineEditMatrix[i][j]->setText("0");
+            }
+
+            bool ok;
+            float temp = ConstraintsLineEditMatrix[i][j]->text().toFloat(&ok);
+            if(!ok){
+                return ConstraintsLineEditMatrix[i][j];
+            }
+            row.append(temp);
+        }
+        constraintsCoefficients.append(row);
+    }
+
+    SimplexData = new SimplexClass(objFuncCoefficients, constraintsCoefficients, inequalitySignComboBoxVect, plans);
 
     return nullptr;
 }
@@ -129,11 +160,23 @@ void MainWindow::AppendConstraint()
         }
         else{
             str = "x_" + QString::number(count);
+            label->setFixedWidth(BOX_WIDTH);
         }
         label->setText(str);
         HBoxLayout->addWidget(LineEdit);
         HBoxLayout->addWidget(label);
     }
+    QComboBox* inequalitySign = new QComboBox;
+    inequalitySign->addItems({"≤", "≥"});
+    inequalitySign->setFixedSize(BOX_WIDTH * 2.5, BOX_HEIGHT);
+    inequalitySignComboBoxVect.append(inequalitySign);
+    HBoxLayout->addWidget(inequalitySign);
+
+    QLineEdit* plan = new QLineEdit();
+    plan->setFixedSize(BOX_WIDTH * 2.5, BOX_HEIGHT);
+    planLineEditVect.append(plan);
+    HBoxLayout->addWidget(plan);
+
     ConstraintsLineEditMatrix.append(currentConstraintLineEditList);
 }
 
@@ -147,6 +190,14 @@ void MainWindow::on_calculateButton_clicked()
         prevFalseLineEdit = falseLineEdit;
         prevFalseLineEdit->setStyleSheet("QLineEdit { background-color: red; }");
         return;
+    }
+
+    SimplexData->DebugOutput();
+
+    QVector<QTableWidget*> tables = SimplexData->CalculateResult();
+
+    for(int i = 0; i < tables.count(); ++i){
+        ui->tablesStackedWidget->addWidget(tables[i]);
     }
 }
 

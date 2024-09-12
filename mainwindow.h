@@ -10,6 +10,7 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QLabel>
+#include <QComboBox>
 #include "simplexclass.h"
 
 QT_BEGIN_NAMESPACE
@@ -57,5 +58,9 @@ private:
     SimplexClass* SimplexData = nullptr;
 
     QLineEdit* prevFalseLineEdit = nullptr;
+
+    QVector<QComboBox*> inequalitySignComboBoxVect;
+
+    QVector<QLineEdit*> planLineEditVect;
 };
 #endif // MAINWINDOW_H
