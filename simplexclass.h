@@ -22,6 +22,8 @@ protected:
 
     QVector<float> plans;
 
+    QVector<int> baseIndexes;
+
 public:
     void SetObjectiveCoefficientVector(QVector<float> otherVector);
 
@@ -33,11 +35,13 @@ public:
 
     void DebugOutput();
 
-    QVector<QTableWidget*> CalculateResult();
+    QVector<QTableWidget*> BuildTables();
 
     QPoint CalculateTableDimentions();
 
     QTableWidget* ConstructTable(QPoint Dimentions);
+
+    bool SimplexAlgorithm();
 
 signals:
 };

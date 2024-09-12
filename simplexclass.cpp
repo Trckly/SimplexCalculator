@@ -1,4 +1,5 @@
 #include "simplexclass.h"
+#include "qheaderview.h"
 
 SimplexClass::SimplexClass(QObject *parent)
     : QObject{parent}
@@ -10,6 +11,10 @@ SimplexClass::SimplexClass(QVector<float> objCoeffVector, QVector<QVector<float>
     SetConstraintsCoefficientMatrix(constrCoeffVector);
     SetSigns(signsVector);
     SetPlans(plansVector);
+
+    for(int i = 1; i <= constrCoeffVector.count(); ++i){
+        baseIndexes.append(i + objCoeffVector.count());
+    }
 }
 
 void SimplexClass::SetObjectiveCoefficientVector(QVector<float> otherVector)
@@ -68,14 +73,20 @@ void SimplexClass::DebugOutput()
     qDebug() << plansStr;
 }
 
-QVector<QTableWidget *> SimplexClass::CalculateResult()
+QVector<QTableWidget *> SimplexClass::BuildTables()
 {
     QVector<QTableWidget*> tables;
     QPoint tableDimentions = CalculateTableDimentions();
 
     bool stop = false;
     for(int i = 0; !stop; ++i){
-
+        if(QTableWidget* table = ConstructTable(tableDimentions)){
+            tables.append(table);
+            stop = true;
+        }
+        else {
+            qDebug() << "Error with construction of table template!";
+        }
     }
 
     return tables;
@@ -84,13 +95,40 @@ QVector<QTableWidget *> SimplexClass::CalculateResult()
 QPoint SimplexClass::CalculateTableDimentions()
 {
     int columns = constrCoeffMatrix.count() + constrCoeffMatrix[0].count() + 4;
-    int rows = constrCoeffMatrix.count() + 2;
+    int rows = constrCoeffMatrix.count() + 1;
 
     return QPoint(rows, columns);
 }
 
 QTableWidget *SimplexClass::ConstructTable(QPoint Dimentions)
 {
-
     QTableWidget* table = new QTableWidget(Dimentions.rx(), Dimentions.ry());
+
+    QStringList headers = {"Base", "c_b", "Plan", "Ratio"};
+    int headersCountSnapshot = headers.count();
+    for (int i = 0; i < Dimentions.ry() - headersCountSnapshot; ++i){
+        QString str = "x" + QString::number(i+1);
+        headers.insert(headers.count() - 1, str);
+    }
+
+    table->setHorizontalHeaderLabels(headers);
+
+    QStringList rowHeaders = {"Q"};
+    for (int i = 0; i < baseIndexes.count(); ++i){
+        QString str = "x" + QString::number(baseIndexes[i]);
+        rowHeaders.insert(rowHeaders.count() - 1, str);
+    }
+
+    table->setVerticalHeaderLabels(rowHeaders);
+
+    // Adjust the size of the cells
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    table->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    return table;
+}
+
+bool SimplexClass::SimplexAlgorithm()
+{
+    return 1;
 }

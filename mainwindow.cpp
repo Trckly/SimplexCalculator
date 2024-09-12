@@ -194,7 +194,7 @@ void MainWindow::on_calculateButton_clicked()
 
     SimplexData->DebugOutput();
 
-    QVector<QTableWidget*> tables = SimplexData->CalculateResult();
+    QVector<QTableWidget*> tables = SimplexData->BuildTables();
 
     for(int i = 0; i < tables.count(); ++i){
         ui->tablesStackedWidget->addWidget(tables[i]);
