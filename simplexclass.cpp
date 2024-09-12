@@ -12,7 +12,7 @@ SimplexClass::SimplexClass(QVector<float> objCoeffVector, QVector<QVector<float>
     SetSigns(signsVector);
     SetPlans(plansVector);
 
-    for(int i = 1; i <= constrCoeffVector.count(); ++i){
+    for(int i = 1; i <= constrCoeffVector.count() - objCoeffVector.count(); ++i){
         baseIndexes.append(i + objCoeffVector.count());
     }
 }
@@ -27,6 +27,12 @@ void SimplexClass::SetConstraintsCoefficientMatrix(QVector<QVector<float> > othe
 {
     constrCoeffMatrix.clear();
     constrCoeffMatrix = otherMatrix;
+
+    for(int i = 0; i < constrCoeffMatrix.count(); ++i){
+        for (int j = 0; j < otherMatrix.count() + otherMatrix[0].count() - constrCoeffMatrix.count(); ++j){
+            constrCoeffMatrix[i].append(0.f);
+        }
+    }
 }
 
 void SimplexClass::SetSigns(QVector<QComboBox *> signsComboBoxVector)
@@ -113,17 +119,48 @@ QTableWidget *SimplexClass::ConstructTable(QPoint Dimentions)
 
     table->setHorizontalHeaderLabels(headers);
 
-    QStringList rowHeaders = {"Q"};
-    for (int i = 0; i < baseIndexes.count(); ++i){
-        QString str = "x" + QString::number(baseIndexes[i]);
-        rowHeaders.insert(rowHeaders.count() - 1, str);
+    QStringList rowHeaders;
+    for (int i = 0; i < table->rowCount(); ++i){
+        rowHeaders.append("");
     }
 
     table->setVerticalHeaderLabels(rowHeaders);
 
+    // Column indexes of table are depended of headers QStringList above
+    for (int i = 0; i < Dimentions.rx(); ++i){
+
+        // Base/c_b fill
+        QString baseStr, c_bStr, planStr;
+        // Without last row
+        if(i < baseIndexes.count()){
+            baseStr = "x" + QString::number(baseIndexes[i]);
+            c_bStr = QString::number(baseIndexes[i] >= plans.count() ? 0 : plans[baseIndexes[i]]);
+            planStr = QString::number(plans[i]);
+
+
+            for (int j = 0; j < Dimentions.ry() - headersCountSnapshot; ++j){
+                QString conCoeffStr;
+                if(j + 1 == baseIndexes[i]){
+                    constrCoeffMatrix[i][j] = 1.f;
+                }
+                conCoeffStr = QString::number(constrCoeffMatrix[i][j]);
+                table->setItem(i, j + 3, new QTableWidgetItem(conCoeffStr));
+            }
+        }
+        // Last row
+        else{
+            baseStr = "Q";
+            c_bStr = "=";
+            planStr = QString::number(QValue);
+        }
+        table->setItem(i, 0, new QTableWidgetItem(baseStr));
+        table->setItem(i, 1, new QTableWidgetItem(c_bStr));
+        table->setItem(i, 2, new QTableWidgetItem(planStr));
+    }
+
     // Adjust the size of the cells
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    table->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    // table->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     return table;
 }

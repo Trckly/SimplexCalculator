@@ -24,6 +24,8 @@ protected:
 
     QVector<int> baseIndexes;
 
+    float QValue = 0;
+
 public:
     void SetObjectiveCoefficientVector(QVector<float> otherVector);
 
