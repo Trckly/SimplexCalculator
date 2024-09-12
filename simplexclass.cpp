@@ -12,8 +12,13 @@ SimplexClass::SimplexClass(QVector<float> objCoeffVector, QVector<QVector<float>
     SetSigns(signsVector);
     SetPlans(plansVector);
 
-    for(int i = 1; i <= constrCoeffVector.count() - objCoeffVector.count(); ++i){
+    for(int i = 1; i <= constrCoeffVector.count(); ++i){
         baseIndexes.append(i + objCoeffVector.count());
+    }
+
+    int lastRowSize = constrCoeffMatrix.count() + objFuncCoeffVector.count();
+    for(int i = 0; i < lastRowSize; ++i){
+        lastRow.append(i < objCoeffVector.count() ? -objCoeffVector[i] : 0);
     }
 }
 
@@ -28,10 +33,9 @@ void SimplexClass::SetConstraintsCoefficientMatrix(QVector<QVector<float> > othe
     constrCoeffMatrix.clear();
     constrCoeffMatrix = otherMatrix;
 
-    for(int i = 0; i < constrCoeffMatrix.count(); ++i){
-        for (int j = 0; j < otherMatrix.count() + otherMatrix[0].count() - constrCoeffMatrix.count(); ++j){
-            constrCoeffMatrix[i].append(0.f);
-        }
+    int newSize = otherMatrix.count() + objFuncCoeffVector.count();
+    for (int i = 0; i < otherMatrix.count(); ++i){
+        constrCoeffMatrix[i].resize(newSize, 0.f);
     }
 }
 
@@ -100,7 +104,7 @@ QVector<QTableWidget *> SimplexClass::BuildTables()
 
 QPoint SimplexClass::CalculateTableDimentions()
 {
-    int columns = constrCoeffMatrix.count() + constrCoeffMatrix[0].count() + 4;
+    int columns = constrCoeffMatrix[0].count() + 4;
     int rows = constrCoeffMatrix.count() + 1;
 
     return QPoint(rows, columns);
@@ -140,10 +144,17 @@ QTableWidget *SimplexClass::ConstructTable(QPoint Dimentions)
 
             for (int j = 0; j < Dimentions.ry() - headersCountSnapshot; ++j){
                 QString conCoeffStr;
-                if(j + 1 == baseIndexes[i]){
-                    constrCoeffMatrix[i][j] = 1.f;
+                if(j < objFuncCoeffVector.count()){
+                    conCoeffStr = QString::number(constrCoeffMatrix[i][j]);
                 }
-                conCoeffStr = QString::number(constrCoeffMatrix[i][j]);
+                else if(j + 1 == baseIndexes[i]){
+                    conCoeffStr = "1";
+                    constrCoeffMatrix[i].append(1.f);
+                }
+                else{
+                    conCoeffStr = "0";
+                    constrCoeffMatrix[i].append(0.f);
+                }
                 table->setItem(i, j + 3, new QTableWidgetItem(conCoeffStr));
             }
         }
@@ -152,10 +163,17 @@ QTableWidget *SimplexClass::ConstructTable(QPoint Dimentions)
             baseStr = "Q";
             c_bStr = "=";
             planStr = QString::number(QValue);
+
+
+            for (int j = 0; j < lastRow.count(); ++j){
+                QString lastRowCoeffStr = QString::number(lastRow[j]);
+                    table->setItem(i, j+3, new QTableWidgetItem(lastRowCoeffStr));
+            }
         }
         table->setItem(i, 0, new QTableWidgetItem(baseStr));
         table->setItem(i, 1, new QTableWidgetItem(c_bStr));
         table->setItem(i, 2, new QTableWidgetItem(planStr));
+
     }
 
     // Adjust the size of the cells

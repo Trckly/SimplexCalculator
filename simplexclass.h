@@ -26,6 +26,8 @@ protected:
 
     float QValue = 0;
 
+    QVector<float> lastRow;
+
 public:
     void SetObjectiveCoefficientVector(QVector<float> otherVector);
 
