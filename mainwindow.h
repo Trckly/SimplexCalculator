@@ -42,6 +42,10 @@ private slots:
 
     void on_calculateButton_clicked();
 
+    void on_previousTable_clicked();
+
+    void on_nextTable_clicked();
+
 private:
     Ui::MainWindow *ui;
 
