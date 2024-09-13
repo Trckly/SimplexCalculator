@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QTableWidget>
 #include <QVector2D>
+#include <QTableWidgetItem>
 
 class SimplexClass : public QObject
 {
@@ -28,6 +29,14 @@ protected:
 
     QVector<float> lastRow;
 
+    QVector<float> ratio;
+
+    float leadingElement;
+
+    int leadingColIndex;
+
+    int leadingRowIndex;
+
 public:
     void SetObjectiveCoefficientVector(QVector<float> otherVector);
 
@@ -37,19 +46,19 @@ public:
 
     void SetPlans(QVector<float> otherVector);
 
-    void DebugOutput();
-
     QVector<QTableWidget*> BuildTables();
 
     QPoint CalculateTableDimentions();
 
-    QTableWidget* ConstructTable(QPoint Dimentions);
+    QTableWidget* ConstructTable(QPoint Dimentions, bool lastTable);
 
     bool SimplexAlgorithm();
 
     int GetMinColumnIndex(float *minValue = nullptr);
 
     int GetMinRowIndex(int colIndex, float *minValue = nullptr);
+
+    bool IsSolved();
 
 signals:
 };

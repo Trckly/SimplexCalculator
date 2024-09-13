@@ -93,16 +93,22 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     {
         // Left Arrow Key: Switch to the previous table
-        if (event->key() == Qt::Key_Left) {
+        if (event->key() == Qt::Key_A) {
             int currentIndex = ui->tablesStackedWidget->currentIndex();
             int previousIndex = (currentIndex - 1 + ui->tablesStackedWidget->count()) % ui->tablesStackedWidget->count();
             ui->tablesStackedWidget->setCurrentIndex(previousIndex);
+
+            QString tableStr = "CT-" + QString::number(previousIndex+1);
+            ui->tableLabel->setText(tableStr);
         }
         // Right Arrow Key: Switch to the next table
-        else if (event->key() == Qt::Key_Right) {
+        else if (event->key() == Qt::Key_D) {
             int currentIndex = ui->tablesStackedWidget->currentIndex();
             int nextIndex = (currentIndex + 1) % ui->tablesStackedWidget->count();
             ui->tablesStackedWidget->setCurrentIndex(nextIndex);
+
+            QString tableStr = "CT-" + QString::number(nextIndex+1);
+            ui->tableLabel->setText(tableStr);
         }
     }
 }
@@ -192,12 +198,35 @@ void MainWindow::on_calculateButton_clicked()
         return;
     }
 
-    SimplexData->DebugOutput();
-
     QVector<QTableWidget*> tables = SimplexData->BuildTables();
 
     for(int i = 0; i < tables.count(); ++i){
         ui->tablesStackedWidget->addWidget(tables[i]);
     }
+
+    QString tableStr = "CT-1";
+    ui->tableLabel->setText(tableStr);
+}
+
+
+void MainWindow::on_previousTable_clicked()
+{
+    int currentIndex = ui->tablesStackedWidget->currentIndex();
+    int previousIndex = (currentIndex - 1 + ui->tablesStackedWidget->count()) % ui->tablesStackedWidget->count();
+    ui->tablesStackedWidget->setCurrentIndex(previousIndex);
+
+    QString tableStr = "CT-" + QString::number(previousIndex+1);
+    ui->tableLabel->setText(tableStr);
+}
+
+
+void MainWindow::on_nextTable_clicked()
+{
+    int currentIndex = ui->tablesStackedWidget->currentIndex();
+    int nextIndex = (currentIndex + 1) % ui->tablesStackedWidget->count();
+    ui->tablesStackedWidget->setCurrentIndex(nextIndex);
+
+    QString tableStr = "CT-" + QString::number(nextIndex+1);
+    ui->tableLabel->setText(tableStr);
 }
 
