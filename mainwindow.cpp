@@ -40,6 +40,9 @@ MainWindow::~MainWindow()
 QLineEdit* MainWindow::ReadAllInputs()
 {
     QVector<float> objFuncCoefficients;
+    QVector<QVector<float>> constraintsCoefficients;
+    QVector<float> plans;
+
     for (int i = 0; i < ObjFuncLineEditList.count(); ++i){
         if(ObjFuncLineEditList[i]->text().isEmpty()){
             ObjFuncLineEditList[i]->setText("0");
@@ -50,11 +53,10 @@ QLineEdit* MainWindow::ReadAllInputs()
         if(!ok){
             return ObjFuncLineEditList[i];
         }
-        objFuncCoefficients.append(temp);
+        plans.append(-temp);
     }
 
-    QVector<QVector<float>> constraintsCoefficients;
-    QVector<float> plans;
+
     for(int i = 0; i < ConstraintsLineEditMatrix.count(); ++i){
         QVector<float> row;
 
@@ -67,7 +69,7 @@ QLineEdit* MainWindow::ReadAllInputs()
         if(!k){
             return planLineEditVect[i];
         }
-        plans.append(t);
+        objFuncCoefficients.append(-t);
 
         for(int j = 0; j < ConstraintsLineEditMatrix[i].count(); ++j){
             if(ConstraintsLineEditMatrix[i][j]->text().isEmpty()){
@@ -79,10 +81,13 @@ QLineEdit* MainWindow::ReadAllInputs()
             if(!ok){
                 return ConstraintsLineEditMatrix[i][j];
             }
-            row.append(temp);
+            row.append(-temp);
         }
         constraintsCoefficients.append(row);
     }
+
+    // Transpose constraints
+    Transpose(constraintsCoefficients);
 
     SimplexData = new SimplexClass(objFuncCoefficients, constraintsCoefficients, inequalitySignComboBoxVect, plans);
 
@@ -148,8 +153,6 @@ void MainWindow::AppendConstraint()
     QHBoxLayout* HBoxLayout = new QHBoxLayout();
     HBoxLayout->setGeometry(QRect(parentRect.topLeft(), QSize(parentRect.width(), 21)));
     ui->constraintVerticalLayout->addLayout(HBoxLayout);
-
-    // ConstraintsLineEditMatrix.append(QVector<QLineEdit*>());
 
     QVector<QLineEdit*> currentConstraintLineEditList;
     int count = 1;
@@ -228,5 +231,19 @@ void MainWindow::on_nextTable_clicked()
 
     QString tableStr = "CT-" + QString::number(nextIndex+1);
     ui->tableLabel->setText(tableStr);
+}
+
+void MainWindow::Transpose(QVector<QVector<float>> &vectorToTranspose)
+{
+    const QVector<QVector<float>> temp = vectorToTranspose;
+    vectorToTranspose.clear();
+
+    for (int i = 0; i < temp[0].count(); ++i){
+        QVector<float> row;
+        for (int j = 0; j < temp.count(); ++j){
+            row.append(temp[j][i]);
+        }
+        vectorToTranspose.append(row);
+    }
 }
 

@@ -66,5 +66,7 @@ private:
     QVector<QComboBox*> inequalitySignComboBoxVect;
 
     QVector<QLineEdit*> planLineEditVect;
+
+    static void Transpose(QVector<QVector<float>> &vectorToTranspose);
 };
 #endif // MAINWINDOW_H
