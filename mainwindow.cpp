@@ -81,7 +81,10 @@ QLineEdit* MainWindow::ReadAllInputs()
             if(!ok){
                 return ConstraintsLineEditMatrix[i][j];
             }
-            row.append(-temp);
+            if(inequalitySignComboBoxVect[j]->currentIndex() == 0)
+                row.append(-temp);
+            else
+                row.append(temp);
         }
         constraintsCoefficients.append(row);
     }
