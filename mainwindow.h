@@ -38,6 +38,8 @@ protected:
 
     void AppendConstraint();
 
+    static void Transpose(QVector<QVector<float>> &vectorToTranspose);
+
 private slots:
 
     void on_calculateButton_clicked();
@@ -67,6 +69,6 @@ private:
 
     QVector<QLineEdit*> planLineEditVect;
 
-    static void Transpose(QVector<QVector<float>> &vectorToTranspose);
+    QVector<QTableWidget*> Tables;
 };
 #endif // MAINWINDOW_H

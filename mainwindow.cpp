@@ -53,10 +53,7 @@ QLineEdit* MainWindow::ReadAllInputs()
         if(!ok){
             return ObjFuncLineEditList[i];
         }
-        // if(inequalitySignComboBoxVect[i]->currentIndex() == 0)
-        //     plans.append(temp);
-        // else
-            plans.append(-temp);
+        plans.append(-temp);
     }
 
 
@@ -197,6 +194,8 @@ void MainWindow::AppendConstraint()
 
 void MainWindow::on_calculateButton_clicked()
 {
+    Tables.clear();
+
     if(prevFalseLineEdit){
         prevFalseLineEdit->setStyleSheet("");
     }
@@ -207,10 +206,10 @@ void MainWindow::on_calculateButton_clicked()
         return;
     }
 
-    QVector<QTableWidget*> tables = SimplexData->BuildTables();
+    Tables = SimplexData->BuildTables();
 
-    for(int i = 0; i < tables.count(); ++i){
-        ui->tablesStackedWidget->addWidget(tables[i]);
+    for(int i = 0; i < Tables.count(); ++i){
+        ui->tablesStackedWidget->addWidget(Tables[i]);
     }
 
     QString tableStr = "CT-1";
