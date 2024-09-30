@@ -53,9 +53,9 @@ QLineEdit* MainWindow::ReadAllInputs()
         if(!ok){
             return ObjFuncLineEditList[i];
         }
-        if(inequalitySignComboBoxVect[i]->currentIndex() == 0)
-            plans.append(temp);
-        else
+        // if(inequalitySignComboBoxVect[i]->currentIndex() == 0)
+        //     plans.append(temp);
+        // else
             plans.append(-temp);
     }
 
