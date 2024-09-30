@@ -67,7 +67,10 @@ QLineEdit* MainWindow::ReadAllInputs()
         if(!k){
             return planLineEditVect[i];
         }
-        plans.append(t);
+        if(inequalitySignComboBoxVect[i]->currentIndex() == 0)
+            plans.append(t);
+        else
+            plans.append(-t);
 
         for(int j = 0; j < ConstraintsLineEditMatrix[i].count(); ++j){
             if(ConstraintsLineEditMatrix[i][j]->text().isEmpty()){
@@ -79,7 +82,10 @@ QLineEdit* MainWindow::ReadAllInputs()
             if(!ok){
                 return ConstraintsLineEditMatrix[i][j];
             }
-            row.append(temp);
+            if(inequalitySignComboBoxVect[i]->currentIndex() == 0)
+                row.append(temp);
+            else
+                row.append(-temp);
         }
         constraintsCoefficients.append(row);
     }

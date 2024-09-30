@@ -51,7 +51,7 @@ private:
 
     const int BOX_WIDTH = 25, BOX_HEIGHT = 21;
 
-    const int COEFFICIENTS_COUNT = 4;
+    const int COEFFICIENTS_COUNT = 2;
 
     QPushButton* AddCoefficientButton;
 
