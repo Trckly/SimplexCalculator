@@ -1,11 +1,15 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+void clearLayout(QHBoxLayout*);
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    ui->coeffCountSpinBox->setMinimum(2);
 
     // Find the QStackedWidget (assuming it is named 'stackedWidget' in your .ui file)
     QStackedWidget *stackedWidget = findChild<QStackedWidget*>("tablesStackedWidget");
@@ -19,15 +23,8 @@ MainWindow::MainWindow(QWidget *parent)
         }
     }
 
-    AddCoefficientButton = new QPushButton();
-    AddCoefficientButton->setText("+");
-    AddCoefficientButton->setFixedSize(BOX_WIDTH, BOX_HEIGHT+10);
-    ui->objectiveFunctionLayout->addWidget(AddCoefficientButton);
-
     // Connecting the button's clicked() signal to a slot (lambda function in this case)
-    connect(AddCoefficientButton, &QPushButton::clicked, this, &MainWindow::onAddCoefficientButtonClicked);
-
-    AddCoefficients(COEFFICIENTS_COUNT);
+    connect(ui->addCoefficientButton, &QPushButton::clicked, this, &MainWindow::onAddCoefficientButtonClicked);
 }
 
 MainWindow::~MainWindow()
@@ -126,26 +123,31 @@ void MainWindow::onAddCoefficientButtonClicked()
     AppendConstraint();
 }
 
-void MainWindow::AddCoefficients(int numToAdd)
+void MainWindow::SetCoefficientsCount(int num)
 {
-    int count = 1;
-    for (int i = 0; i < numToAdd; ++i){
+    // '-2' because we also have label and button that are not LineEdits
+    int layoutChildrenCount = ui->objectiveFunctionLayout->count() - 1;
+
+    ObjFuncLineEditList.clear();
+    clearLayout(ui->objectiveFunctionLayout);
+
+    for (int i = 0; i < num; ++i){
         QLineEdit* LineEdit = new QLineEdit(this);
         LineEdit->setFixedSize(BOX_WIDTH, BOX_HEIGHT);
         ObjFuncLineEditList.append(LineEdit);
 
         QLabel* label = new QLabel;
         QString str;
-        if(i != numToAdd - 1){
-            str = "x_" + QString::number(count++) + " + ";
+        if(i != num - 1){
+            str = "x_" + QString::number(i+1) + " + ";
             label->setFixedWidth(BOX_WIDTH + 8);
         }
         else{
-            str = "x_" + QString::number(count);
+            str = "x_" + QString::number(i+1);
         }
         label->setText(str);
-        ui->objectiveFunctionLayout->insertWidget(ui->objectiveFunctionLayout->count() - 1, LineEdit);
-        ui->objectiveFunctionLayout->insertWidget(ui->objectiveFunctionLayout->count() - 1, label);
+        ui->objectiveFunctionLayout->addWidget(LineEdit);
+        ui->objectiveFunctionLayout->addWidget(label);
     }
 }
 
@@ -159,14 +161,14 @@ void MainWindow::AppendConstraint()
 
     QVector<QLineEdit*> currentConstraintLineEditList;
     int count = 1;
-    for (int i = 0; i < COEFFICIENTS_COUNT; ++i){
+    for (int i = 0; i < ui->coeffCountSpinBox->value(); ++i){
         QLineEdit* LineEdit = new QLineEdit(this);
         LineEdit->setFixedSize(BOX_WIDTH, BOX_HEIGHT);
         currentConstraintLineEditList.append(LineEdit);
 
         QLabel* label = new QLabel;
         QString str;
-        if(i != COEFFICIENTS_COUNT - 1){
+        if(i != ui->coeffCountSpinBox->value() - 1){
             str = "x_" + QString::number(count++) + " + ";
             label->setFixedWidth(BOX_WIDTH + 8);
         }
@@ -252,3 +254,20 @@ void MainWindow::Transpose(QVector<QVector<float>> &vectorToTranspose)
     }
 }
 
+
+void MainWindow::on_coeffCountSpinBox_valueChanged(int arg)
+{
+    SetCoefficientsCount(arg);
+}
+
+void clearLayout(QHBoxLayout* layout) {
+    QLayoutItem* item;
+    while ((item = layout->takeAt(0)) != nullptr) {
+        QWidget* widget = item->widget();
+        if (widget) {
+            widget->hide();   // Hide the widget (optional)
+            widget->deleteLater();  // Schedule widget for deletion
+        }
+        delete item;  // Delete the layout item
+    }
+}

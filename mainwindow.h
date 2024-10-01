@@ -34,7 +34,7 @@ protected:
 
     void onAddCoefficientButtonClicked();
 
-    void AddCoefficients(int numToAdd);
+    void SetCoefficientsCount(int numToAdd);
 
     void AppendConstraint();
 
@@ -48,14 +48,14 @@ private slots:
 
     void on_nextTable_clicked();
 
+    void on_coeffCountSpinBox_valueChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
 
     const int BOX_WIDTH = 25, BOX_HEIGHT = 21;
 
     const int COEFFICIENTS_COUNT = 2;
-
-    QPushButton* AddCoefficientButton;
 
     QVector<QLineEdit*> ObjFuncLineEditList;
 
