@@ -1,11 +1,23 @@
 #include "lpmethods.h"
 
-LPMethods::LPMethods(QObject *parent)
+LPMethod::LPMethod(const QVector<float>& objFuncCoeffVector, const QVector<QVector<float>>& constrCoeffMatrix,
+                     const QVector<int>& signs, const QVector<float>& plans, QObject *parent)
     : QObject{parent}
-{}
+{
+    this->objFuncCoeffVector = objFuncCoeffVector;
+    this->constrCoeffMatrix = constrCoeffMatrix;
+    this->signs = signs;
+    this->plans = plans;
+    lastRow.clear();
+    ratio.clear();
+    baseIndexes.clear();
+    leadingElement = 0.f;
+    leadingRowIndex = 0;
+    leadingColIndex = 0;
+    resultValue = 0;
+}
 
-bool LPMethods::SquareRule(int &outLeadRowIndex, int &outLeadColIndex, QVector<int> &outBaseIndexes, float &outResultValue,
-                           QVector<float> &outRatio, QVector<float> &outLastRow)
+bool LPMethod::SquareRule()
 {
     for (int j = 0; j < constrCoeffMatrix[0].count(); ++j) {
         constrCoeffMatrix[leadingRowIndex][j] /= leadingElement;
@@ -35,17 +47,10 @@ bool LPMethods::SquareRule(int &outLeadRowIndex, int &outLeadColIndex, QVector<i
         }
     }
 
-    outLeadRowIndex = leadingRowIndex;
-    outLeadColIndex = leadingColIndex;
-    outBaseIndexes = baseIndexes;
-    outResultValue = resultValue;
-    outRatio = ratio;
-    outLastRow = lastRow;
-
     return IsSolved();
 }
 
-bool LPMethods::IsSolved()
+bool LPMethod::IsSolved()
 {
     bool bSolved = true;
     for (int i = 0; i < lastRow.count(); ++i){
@@ -53,5 +58,22 @@ bool LPMethods::IsSolved()
     }
 
     return bSolved;
+}
+
+void LPMethod::GetAll(QVector<float> &outObjFuncCoeffVector, QVector<QVector<float>> &outConstrCoeffMatrix,
+                       QVector<int> &outSigns, QVector<float> &outPlans, int &outLeadRowIndex, int &outLeadColIndex,
+                       QVector<int> &outBaseIndexes, float &outResultValue, QVector<float> &outRatio,
+                       QVector<float> &outLastRow)
+{
+    outObjFuncCoeffVector = objFuncCoeffVector;
+    outConstrCoeffMatrix = constrCoeffMatrix;
+    outSigns = signs;
+    outPlans = plans;
+    outLeadRowIndex = leadingRowIndex;
+    outLeadColIndex = leadingColIndex;
+    outBaseIndexes = baseIndexes;
+    outResultValue = resultValue;
+    outRatio = ratio;
+    outLastRow = lastRow;
 }
 

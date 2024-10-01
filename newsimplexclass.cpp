@@ -1,18 +1,16 @@
 #include "newsimplexclass.h"
 
-NewSimplexClass::NewSimplexClass(QObject *parent)
-    : LPMethods{parent}
-{}
-
-bool NewSimplexClass::SolveOneStep(QVector<float>& objFuncCoeffVector, QVector<QVector<float>>& constrCoeffMatrix,
-                                   QVector<int>& signs, QVector<float>& plans, int& outLeadRowIndex, int& outLeadColIndex,
-                                   QVector<int>& outBaseIndexes, float& outResultValue, QVector<float>& outRatio,
-                                   QVector<float>& outLastRow)
+NewSimplexClass::NewSimplexClass(const QVector<float> &objFuncCoeffVector,
+                                 const QVector<QVector<float> > &constrCoeffMatrix,
+                                 const QVector<int> &signs, const QVector<float> &plans, QObject *parent)
+    : LPMethod(objFuncCoeffVector, constrCoeffMatrix, signs, plans, parent)
 {
-    this->objFuncCoeffVector = objFuncCoeffVector;
-    this->constrCoeffMatrix = constrCoeffMatrix;
-    this->signs = signs;
-    this->plans = plans;
+    ApplySignEffect();
+}
+
+bool NewSimplexClass::SolveOneStep()
+{
+
     ratio.resize(objFuncCoeffVector.count(), 0.f);
 
     leadingColIndex = GetMinColumnIndex();
@@ -21,12 +19,7 @@ bool NewSimplexClass::SolveOneStep(QVector<float>& objFuncCoeffVector, QVector<Q
 
     leadingElement = this->constrCoeffMatrix[leadingRowIndex][leadingColIndex];
 
-    objFuncCoeffVector = this->objFuncCoeffVector;
-    constrCoeffMatrix = this->constrCoeffMatrix;
-    signs = this->signs;
-    plans = this->plans;
-
-    return SquareRule(outLeadRowIndex, outLeadColIndex, outBaseIndexes, outResultValue, outRatio, outLastRow);
+    return SquareRule();
 }
 
 int NewSimplexClass::GetMinColumnIndex()
@@ -63,4 +56,16 @@ int NewSimplexClass::GetMinRowIndex(int colIndex)
         ratio[i] = tempRatio;
     }
     return minIndex;
+}
+
+void NewSimplexClass::ApplySignEffect()
+{
+    for (int i = 0; i < constrCoeffMatrix.count(); ++i){
+        if(signs[i] == 1){
+            for (int j = 0; j < constrCoeffMatrix[0].count(); ++j){
+                constrCoeffMatrix[i][j] *= -1;
+            }
+            plans[i] *= -1;
+        }
+    }
 }

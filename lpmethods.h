@@ -3,11 +3,12 @@
 
 #include <QObject>
 
-class LPMethods : public QObject
+class LPMethod : public QObject
 {
     Q_OBJECT
 public:
-    explicit LPMethods(QObject *parent = nullptr);
+    explicit LPMethod(const QVector<float>& objFuncCoeffVector, const QVector<QVector<float>>& constrCoeffMatrix,
+                       const QVector<int>& signs, const QVector<float>& plans, QObject *parent = nullptr);
 
 protected:
     QVector<float> objFuncCoeffVector;
@@ -23,27 +24,29 @@ protected:
 
     QVector<float> ratio;
 
-    float leadingElement;
+    QVector<int> baseIndexes;
 
-    int leadingColIndex;
+    float leadingElement;
 
     int leadingRowIndex;
 
-    float resultValue = 0;
+    int leadingColIndex;
 
-    QVector<int> baseIndexes;
+    float resultValue;
 
 protected:
-    virtual bool SolveOneStep(QVector<float>& objFuncCoeffVector, QVector<QVector<float>>& constrCoeffMatrix,
-                              QVector<int>& signs, QVector<float>& plans, int& outLeadRowIndex, int& outLeadColIndex,
-                              QVector<int>& outBaseIndexes, float& outResultValue, QVector<float>& outRatio,
-                              QVector<float>& outLastRow) = 0;
+    virtual bool SolveOneStep() = 0;
 
-    bool SquareRule(int& outLeadRowIndex, int& outLeadColIndex,
-                    QVector<int>& outBaseIndexes, float& outResultValue, QVector<float>& outRatio,
-                    QVector<float>& outLastRow);
+    bool SquareRule();
 
     bool IsSolved();
+
+    void GetAll(QVector<float>& outObjFuncCoeffVector, QVector<QVector<float>>& outConstrCoeffMatrix,
+                QVector<int>& outSigns, QVector<float>& outPlans, int& outLeadRowIndex, int& outLeadColIndex,
+                QVector<int>& outBaseIndexes, float& outResultValue, QVector<float>& outRatio,
+                QVector<float>& outLastRow);
+
+    virtual void ApplySignEffect() = 0;
 
 signals:
 };

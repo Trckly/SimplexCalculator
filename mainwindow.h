@@ -11,7 +11,7 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QComboBox>
-#include "simplexclass.h"
+#include "newsimplexclass.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -44,7 +44,7 @@ protected:
 
     void AppendConstraint();
 
-
+    QVector<int> ConvertSigns();
 
     static void Transpose(QVector<QVector<float>> &vectorToTranspose);
 
@@ -67,11 +67,11 @@ private:
 
     const int COEFFICIENTS_COUNT = 2;
 
-    QVector<QLineEdit*> ObjFuncLineEditList;
+    LPMethod* lpMethod = nullptr;
 
-    QVector<QVector<QLineEdit*>> ConstraintsLineEditMatrix;
+    QVector<QLineEdit*> objFuncLineEditList;
 
-    SimplexClass* SimplexData = nullptr;
+    QVector<QVector<QLineEdit*>> constraintsLineEditMatrix;
 
     QLineEdit* prevFalseLineEdit = nullptr;
 
@@ -79,7 +79,7 @@ private:
 
     QVector<QLineEdit*> planLineEditVect;
 
-    QVector<QTableWidget*> Tables;
+    QVector<QTableWidget*> tables;
 
     Method currentMethod;
 };

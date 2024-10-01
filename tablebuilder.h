@@ -2,17 +2,24 @@
 #define TABLEBUILDER_H
 
 #include <QObject>
+#include "lpmethods.h"
 
 class TableBuilder : public QObject
 {
     Q_OBJECT
 public:
-    explicit TableBuilder(QObject *parent = nullptr);
-
-private:
+    explicit TableBuilder(LPMethod* method, QObject *parent = nullptr);
 
 protected:
-    void ConstructTable();
+    LPMethod* currentMethod;
+
+private:
+    void MakeGeneralTable();
+
+protected:
+    void ConstructSimplexTable();
+
+    void ConstructDualTable();
 
 signals:
 };

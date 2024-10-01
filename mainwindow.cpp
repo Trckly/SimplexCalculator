@@ -39,22 +39,22 @@ MainWindow::~MainWindow()
 QLineEdit* MainWindow::ReadAllInputs()
 {
     QVector<float> objFuncCoefficients;
-    for (int i = 0; i < ObjFuncLineEditList.count(); ++i){
-        if(ObjFuncLineEditList[i]->text().isEmpty()){
-            ObjFuncLineEditList[i]->setText("0");
+    for (int i = 0; i < objFuncLineEditList.count(); ++i){
+        if(objFuncLineEditList[i]->text().isEmpty()){
+            objFuncLineEditList[i]->setText("0");
         }
 
         bool ok;
-        float temp = ObjFuncLineEditList[i]->text().toFloat(&ok);
+        float temp = objFuncLineEditList[i]->text().toFloat(&ok);
         if(!ok){
-            return ObjFuncLineEditList[i];
+            return objFuncLineEditList[i];
         }
         objFuncCoefficients.append(temp);
     }
 
     QVector<QVector<float>> constraintsCoefficients;
     QVector<float> plans;
-    for(int i = 0; i < ConstraintsLineEditMatrix.count(); ++i){
+    for(int i = 0; i < constraintsLineEditMatrix.count(); ++i){
         QVector<float> row;
 
         if(planLineEditVect[i]->text().isEmpty()){
@@ -66,31 +66,25 @@ QLineEdit* MainWindow::ReadAllInputs()
         if(!k){
             return planLineEditVect[i];
         }
-        if(inequalitySignComboBoxVect[i]->currentIndex() == 0)
-            plans.append(t);
-        else
-            plans.append(-t);
+        plans.append(t);
 
-        for(int j = 0; j < ConstraintsLineEditMatrix[i].count(); ++j){
-            if(ConstraintsLineEditMatrix[i][j]->text().isEmpty()){
-                ConstraintsLineEditMatrix[i][j]->setText("0");
+        for(int j = 0; j < constraintsLineEditMatrix[i].count(); ++j){
+            if(constraintsLineEditMatrix[i][j]->text().isEmpty()){
+                constraintsLineEditMatrix[i][j]->setText("0");
             }
 
             bool ok;
-            float temp = ConstraintsLineEditMatrix[i][j]->text().toFloat(&ok);
+            float temp = constraintsLineEditMatrix[i][j]->text().toFloat(&ok);
             if(!ok){
-                return ConstraintsLineEditMatrix[i][j];
+                return constraintsLineEditMatrix[i][j];
             }
-            if(inequalitySignComboBoxVect[i]->currentIndex() == 0)
-                row.append(temp);
-            else
-                row.append(-temp);
+            row.append(temp);
         }
         constraintsCoefficients.append(row);
     }
 
     if(currentMethod == Simplex){
-        SimplexData = new SimplexClass(objFuncCoefficients, constraintsCoefficients, inequalitySignComboBoxVect, plans);
+        lpMethod = new NewSimplexClass(objFuncCoefficients, constraintsCoefficients, ConvertSigns(), plans);
         qDebug() << "Simplex";
     }
     if(currentMethod == DualSimplex){
@@ -134,13 +128,13 @@ void MainWindow::onAddCoefficientButtonClicked()
 
 void MainWindow::SetCoefficientsCount(int num)
 {
-    ObjFuncLineEditList.clear();
+    objFuncLineEditList.clear();
     clearLayout(ui->objectiveFunctionLayout);
 
     for (int i = 0; i < num; ++i){
         QLineEdit* LineEdit = new QLineEdit(this);
         LineEdit->setFixedSize(BOX_WIDTH, BOX_HEIGHT);
-        ObjFuncLineEditList.append(LineEdit);
+        objFuncLineEditList.append(LineEdit);
 
         QLabel* label = new QLabel;
         QString str;
@@ -197,12 +191,21 @@ void MainWindow::AppendConstraint()
     planLineEditVect.append(plan);
     HBoxLayout->addWidget(plan);
 
-    ConstraintsLineEditMatrix.append(currentConstraintLineEditList);
+    constraintsLineEditMatrix.append(currentConstraintLineEditList);
+}
+
+QVector<int> MainWindow::ConvertSigns()
+{
+    QVector<int> inequalitySigns;
+    for (QComboBox* signComboBox : inequalitySignComboBoxVect){
+        inequalitySigns.append(signComboBox->currentIndex());
+    }
+    return inequalitySigns;
 }
 
 void MainWindow::on_calculateButton_clicked()
 {
-    Tables.clear();
+    tables.clear();
 
     if(prevFalseLineEdit){
         prevFalseLineEdit->setStyleSheet("");
@@ -214,10 +217,10 @@ void MainWindow::on_calculateButton_clicked()
         return;
     }
 
-    Tables = SimplexData->BuildTables();
+    // tables = SimplexData->BuildTables();
 
-    for(int i = 0; i < Tables.count(); ++i){
-        ui->tablesStackedWidget->addWidget(Tables[i]);
+    for(int i = 0; i < tables.count(); ++i){
+        ui->tablesStackedWidget->addWidget(tables[i]);
     }
 
     QString tableStr = "CT-1";

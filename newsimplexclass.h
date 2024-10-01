@@ -4,23 +4,23 @@
 #include <QObject>
 #include "lpmethods.h"
 
-class NewSimplexClass : public LPMethods
+class NewSimplexClass : public LPMethod
 {
     Q_OBJECT
 public:
-    explicit NewSimplexClass(QObject *parent = nullptr);
+    explicit NewSimplexClass(const QVector<float>& objFuncCoeffVector, const QVector<QVector<float>>& constrCoeffMatrix,
+                             const QVector<int>& signs, const QVector<float>& plans, QObject *parent = nullptr);
 
 public:
-    virtual bool SolveOneStep(QVector<float>& objFuncCoeffVector, QVector<QVector<float>>& constrCoeffMatrix,
-                              QVector<int>& signs, QVector<float>& plans, int& outLeadRowIndex, int& outLeadColIndex,
-                              QVector<int>& outBaseIndexes, float& outResultValue, QVector<float>& outRatio,
-                              QVector<float>& outLastRow) override;
+    virtual bool SolveOneStep() override;
 
 
 private:
     int GetMinColumnIndex();
 
     int GetMinRowIndex(int colIndex);
+
+    virtual void ApplySignEffect() override;
 
 signals:
 };
