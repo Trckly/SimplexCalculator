@@ -11,15 +11,21 @@ CONFIG += c++17
 SOURCES += \
     dualsimplexclass.cpp \
     gomoryclass.cpp \
+    lpmethods.cpp \
     main.cpp \
     mainwindow.cpp \
-    simplexclass.cpp
+    newsimplexclass.cpp \
+    simplexclass.cpp \
+    tablebuilder.cpp
 
 HEADERS += \
     dualsimplexclass.h \
     gomoryclass.h \
+    lpmethods.h \
     mainwindow.h \
-    simplexclass.h
+    newsimplexclass.h \
+    simplexclass.h \
+    tablebuilder.h
 
 FORMS += \
     mainwindow.ui

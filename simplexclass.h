@@ -25,7 +25,7 @@ protected:
 
     QVector<int> baseIndexes;
 
-    float QValue = 0;
+    float ResultValue = 0;
 
     QVector<float> lastRow;
 

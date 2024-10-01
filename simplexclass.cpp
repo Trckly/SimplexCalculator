@@ -147,7 +147,7 @@ QTableWidget *SimplexClass::ConstructTable(QPoint Dimentions, bool lastTable)
         else{
             baseStr = "Q";
             c_bStr = "=";
-            planStr = QString::number(QValue);
+            planStr = QString::number(ResultValue);
 
 
             for (int j = 0; j < lastRow.count(); ++j){
@@ -219,7 +219,7 @@ bool SimplexClass::SimplexAlgorithm()
             for (int j = 0; j < lastRow.count(); ++j){
                 lastRow[j] -= rowFactor * constrCoeffMatrix[leadingRowIndex][j];
             }
-            QValue -= rowFactor * plans[leadingRowIndex];
+            ResultValue -= rowFactor * plans[leadingRowIndex];
         }
     }
     return IsSolved();

@@ -44,6 +44,8 @@ protected:
 
     void AppendConstraint();
 
+
+
     static void Transpose(QVector<QVector<float>> &vectorToTranspose);
 
 private slots:
@@ -55,6 +57,8 @@ private slots:
     void on_nextTable_clicked();
 
     void on_coeffCountSpinBox_valueChanged(int arg1);
+
+    void on_methodComboBox_currentIndexChanged(int index);
 
 private:
     Ui::MainWindow *ui;
@@ -76,5 +80,7 @@ private:
     QVector<QLineEdit*> planLineEditVect;
 
     QVector<QTableWidget*> Tables;
+
+    Method currentMethod;
 };
 #endif // MAINWINDOW_H

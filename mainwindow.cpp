@@ -89,7 +89,16 @@ QLineEdit* MainWindow::ReadAllInputs()
         constraintsCoefficients.append(row);
     }
 
-    SimplexData = new SimplexClass(objFuncCoefficients, constraintsCoefficients, inequalitySignComboBoxVect, plans);
+    if(currentMethod == Simplex){
+        SimplexData = new SimplexClass(objFuncCoefficients, constraintsCoefficients, inequalitySignComboBoxVect, plans);
+        qDebug() << "Simplex";
+    }
+    if(currentMethod == DualSimplex){
+        qDebug() << "Dual";
+    }
+    if(currentMethod == Method::Gomory){
+        qDebug() << "Gomory";
+    }
 
     return nullptr;
 }
@@ -268,3 +277,9 @@ void clearLayout(QHBoxLayout* layout) {
         delete item;  // Delete the layout item
     }
 }
+
+void MainWindow::on_methodComboBox_currentIndexChanged(int index)
+{
+    currentMethod = static_cast<Method>(index);
+}
+
