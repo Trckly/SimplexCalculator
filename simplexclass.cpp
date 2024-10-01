@@ -77,8 +77,8 @@ QVector<QTableWidget *> SimplexClass::BuildTables()
                 qDebug() << "Error with construction of table template!";
             }
         }
-        return tables;
     }
+    return tables;
 }
 
 QPoint SimplexClass::CalculateTableDimentions()
