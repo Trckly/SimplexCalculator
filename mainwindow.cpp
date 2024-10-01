@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->methodComboBox->addItems({"Simplex", "DualSimplex", "Gomory"});
+
     ui->coeffCountSpinBox->setMinimum(2);
 
     // Find the QStackedWidget (assuming it is named 'stackedWidget' in your .ui file)

@@ -19,6 +19,12 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
+enum Method{
+    Simplex,
+    DualSimplex,
+    Gomory
+};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
