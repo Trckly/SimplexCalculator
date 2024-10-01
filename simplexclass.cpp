@@ -21,7 +21,7 @@ SimplexClass::SimplexClass(QVector<float> objCoeffVector, QVector<QVector<float>
         lastRow.append(i < objCoeffVector.count() ? -objCoeffVector[i] : 0);
     }
 
-    ratio.resize(lastRow.count(), 0.f);
+    ratio.resize(objCoeffVector.count(), 0.f);
 }
 
 void SimplexClass::SetObjectiveCoefficientVector(QVector<float> otherVector)
@@ -77,14 +77,21 @@ QVector<QTableWidget *> SimplexClass::BuildTables()
                 qDebug() << "Error with construction of table template!";
             }
         }
+        // for(int i = 0; i < 5; ++i){
+        //     bool quit = SimplexAlgorithm();
+
+        //     if(QTableWidget* table = ConstructTable(tableDimentions, quit)){
+        //         tables.append(table);
+        //     }
+        // }
+        return tables;
     }
-    return tables;
 }
 
 QPoint SimplexClass::CalculateTableDimentions()
 {
-    int columns = constrCoeffMatrix[0].count() + 3;
-    int rows = constrCoeffMatrix.count() + 2;
+    int columns = constrCoeffMatrix[0].count() + 4;
+    int rows = constrCoeffMatrix.count() + 1;
 
     return QPoint(rows, columns);
 }
@@ -93,11 +100,11 @@ QTableWidget *SimplexClass::ConstructTable(QPoint Dimentions, bool lastTable)
 {
     QTableWidget* table = new QTableWidget(Dimentions.rx(), Dimentions.ry());
 
-    QStringList headers = {"Base", "c_b", "Plan"};
+    QStringList headers = {"Base", "c_b", "Plan", "Ratio"};
     int headersCountSnapshot = headers.count();
     for (int i = 0; i < Dimentions.ry() - headersCountSnapshot; ++i){
-        QString str = "y" + QString::number(i+1);
-        headers.insert(headers.count(), str);
+        QString str = "x" + QString::number(i+1);
+        headers.insert(headers.count() - 1, str);
     }
 
     table->setHorizontalHeaderLabels(headers);
@@ -116,7 +123,7 @@ QTableWidget *SimplexClass::ConstructTable(QPoint Dimentions, bool lastTable)
         QString baseStr, c_bStr, planStr;
         // Without last row
         if(i < baseIndexes.count()){
-            baseStr = "y" + QString::number(baseIndexes[i]);
+            baseStr = "x" + QString::number(baseIndexes[i]);
             c_bStr = QString::number(baseIndexes[i] > objFuncCoeffVector.count() ? 0 : objFuncCoeffVector[baseIndexes[i] - 1]);
             planStr = QString::number(plans[i]);
 
@@ -137,25 +144,21 @@ QTableWidget *SimplexClass::ConstructTable(QPoint Dimentions, bool lastTable)
             }
         }
         // Last row
-        else if(i == baseIndexes.count()){
-            baseStr = "F";
+        else{
+            baseStr = "Q";
             c_bStr = "=";
             planStr = QString::number(QValue);
 
 
             for (int j = 0; j < lastRow.count(); ++j){
                 QString lastRowCoeffStr = QString::number(lastRow[j]);
-                    table->setItem(i, j+3, new QTableWidgetItem(lastRowCoeffStr));
+                table->setItem(i, j+3, new QTableWidgetItem(lastRowCoeffStr));
             }
-        }
-        else{
-            baseStr = "Ratio";
-            c_bStr = "";
-            planStr = "";
         }
         table->setItem(i, 0, new QTableWidgetItem(baseStr));
         table->setItem(i, 1, new QTableWidgetItem(c_bStr));
         table->setItem(i, 2, new QTableWidgetItem(planStr));
+
     }
 
     // Adjust the size of the cells
@@ -163,9 +166,9 @@ QTableWidget *SimplexClass::ConstructTable(QPoint Dimentions, bool lastTable)
     // table->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     if(!lastTable){
-        leadingRowIndex = GetMinRowIndex();
+        leadingColIndex = GetMinColumnIndex();
 
-        leadingColIndex = GetMinColumnIndex(leadingRowIndex);
+        leadingRowIndex = GetMinRowIndex(leadingColIndex);
 
         leadingElement = constrCoeffMatrix[leadingRowIndex][leadingColIndex];
 
@@ -175,7 +178,15 @@ QTableWidget *SimplexClass::ConstructTable(QPoint Dimentions, bool lastTable)
         for (int i = 0; i < ratio.count(); ++i){
             ratio[i] < 0 ? ratioStr = "-" : ratioStr = QString::number(ratio[i]);
 
-            table->setItem(table->rowCount() - 1,  i + 3, new QTableWidgetItem(ratioStr));
+            table->setItem(i, table->columnCount() - 1, new QTableWidgetItem(ratioStr));
+        }
+    }
+
+    for (int i = 0; i < table->rowCount(); ++i){
+        for (int j = 0; j < table->columnCount(); ++j){
+            if(QTableWidgetItem* currentItem = table->item(i, j)){
+                currentItem->setFlags(Qt::NoItemFlags);
+            }
         }
     }
 
@@ -187,6 +198,7 @@ bool SimplexClass::SimplexAlgorithm()
     for (int j = 0; j < constrCoeffMatrix[0].count(); ++j) {
         constrCoeffMatrix[leadingRowIndex][j] /= leadingElement;
     }
+
     plans[leadingRowIndex] /= leadingElement;
 
     for (int i = 0; i <= constrCoeffMatrix.count(); ++i){
@@ -213,18 +225,18 @@ bool SimplexClass::SimplexAlgorithm()
     return IsSolved();
 }
 
-int SimplexClass::GetMinRowIndex(float *minValue)
+int SimplexClass::GetMinColumnIndex(float *minValue)
 {
     float min = 0;
     int minIndex = 0;
-    for (int i = 0; i < plans.count(); ++i){
+    for (int i = 0; i < lastRow.count(); ++i){
         if(i == 0){
-            min = plans[i];
+            min = lastRow[i];
             minIndex = i;
             continue;
         }
-        if(plans[i] < min){
-            min = plans[i];
+        if(lastRow[i] < min){
+            min = lastRow[i];
             minIndex = i;
         }
     }
@@ -234,14 +246,14 @@ int SimplexClass::GetMinRowIndex(float *minValue)
     return minIndex;
 }
 
-int SimplexClass::GetMinColumnIndex(int rowIndex, float *minValue)
+int SimplexClass::GetMinRowIndex(int colIndex, float *minValue)
 {
     float min = std::numeric_limits<float>::max(), tempRatio;
     int minIndex = 0;
-    for (int i = 0; i < constrCoeffMatrix[0].count(); ++i){
+    for (int i = 0; i < constrCoeffMatrix.count(); ++i){
         tempRatio = -1;
-        if(constrCoeffMatrix[rowIndex][i] < 0){
-            tempRatio = -lastRow[i] / constrCoeffMatrix[rowIndex][i];
+        if(constrCoeffMatrix[i][colIndex] > 0){
+            tempRatio = plans[i] / constrCoeffMatrix[i][colIndex];
             if(tempRatio < min){
                 min = tempRatio;
                 minIndex = i;
@@ -258,8 +270,8 @@ int SimplexClass::GetMinColumnIndex(int rowIndex, float *minValue)
 bool SimplexClass::IsSolved()
 {
     bool bSolved = true;
-    for (int i = 0; i < plans.count(); ++i){
-        plans[i] < 0 ? bSolved = false : bSolved;
+    for (int i = 0; i < lastRow.count(); ++i){
+        lastRow[i] < 0 ? bSolved = false : bSolved;
     }
 
     return bSolved;
