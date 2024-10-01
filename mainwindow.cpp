@@ -39,9 +39,6 @@ MainWindow::~MainWindow()
 QLineEdit* MainWindow::ReadAllInputs()
 {
     QVector<float> objFuncCoefficients;
-    QVector<QVector<float>> constraintsCoefficients;
-    QVector<float> plans;
-
     for (int i = 0; i < ObjFuncLineEditList.count(); ++i){
         if(ObjFuncLineEditList[i]->text().isEmpty()){
             ObjFuncLineEditList[i]->setText("0");
@@ -52,10 +49,11 @@ QLineEdit* MainWindow::ReadAllInputs()
         if(!ok){
             return ObjFuncLineEditList[i];
         }
-        plans.append(-temp);
+        objFuncCoefficients.append(temp);
     }
 
-
+    QVector<QVector<float>> constraintsCoefficients;
+    QVector<float> plans;
     for(int i = 0; i < ConstraintsLineEditMatrix.count(); ++i){
         QVector<float> row;
 
@@ -68,7 +66,10 @@ QLineEdit* MainWindow::ReadAllInputs()
         if(!k){
             return planLineEditVect[i];
         }
-        objFuncCoefficients.append(-t);
+        if(inequalitySignComboBoxVect[i]->currentIndex() == 0)
+            plans.append(t);
+        else
+            plans.append(-t);
 
         for(int j = 0; j < ConstraintsLineEditMatrix[i].count(); ++j){
             if(ConstraintsLineEditMatrix[i][j]->text().isEmpty()){
@@ -81,15 +82,12 @@ QLineEdit* MainWindow::ReadAllInputs()
                 return ConstraintsLineEditMatrix[i][j];
             }
             if(inequalitySignComboBoxVect[i]->currentIndex() == 0)
-                row.append(-temp);
-            else
                 row.append(temp);
+            else
+                row.append(-temp);
         }
         constraintsCoefficients.append(row);
     }
-
-    // Transpose constraints
-    Transpose(constraintsCoefficients);
 
     SimplexData = new SimplexClass(objFuncCoefficients, constraintsCoefficients, inequalitySignComboBoxVect, plans);
 
