@@ -15,6 +15,40 @@ LPMethod::LPMethod(const QVector<float>& objFuncCoeffVector, const QVector<QVect
     structure.leadRowIndex = 0;
     structure.leadColIndex = 0;
     structure.resultValue = 0;
+
+    SetupBaseIndexes();
+
+    SetupLastRow();
+
+    structure.ratio.resize(objFuncCoeffVector.count(), 0.f);
+
+    SetupConstraintsCoefficientMatrix(constrCoeffMatrix);
+}
+
+void LPMethod::SetupConstraintsCoefficientMatrix(const QVector<QVector<float> > &otherMatrix)
+{
+    structure.constrCoeffMatrix.clear();
+    structure.constrCoeffMatrix = otherMatrix;
+
+    int newSize = otherMatrix.count() + structure.objFuncCoeffVector.count();
+    for (int i = 0; i < otherMatrix.count(); ++i){
+        structure.constrCoeffMatrix[i].resize(newSize, 0.f);
+    }
+}
+
+void LPMethod::SetupBaseIndexes()
+{
+    for(int i = 1; i <= structure.objFuncCoeffVector.count(); ++i){
+        structure.baseIndexes.append(i + structure.objFuncCoeffVector.count());
+    }
+}
+
+void LPMethod::SetupLastRow()
+{
+    int lastRowSize = structure.constrCoeffMatrix.count() + structure.objFuncCoeffVector.count();
+    for(int i = 0; i < lastRowSize; ++i){
+        structure.lastRow.append(i < structure.objFuncCoeffVector.count() ? -structure.objFuncCoeffVector[i] : 0);
+    }
 }
 
 bool LPMethod::SquareRule()

@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "tablebuilder.h"
 #include "ui_mainwindow.h"
 
 void clearLayout(QHBoxLayout*);
@@ -34,68 +35,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-// In any line edit that is empty it automatically asumes there is supposed to be zero.
-// Returns first found invalid input line edit
-QLineEdit* MainWindow::ReadAllInputs()
-{
-    QVector<float> objFuncCoefficients;
-    for (int i = 0; i < objFuncLineEditList.count(); ++i){
-        if(objFuncLineEditList[i]->text().isEmpty()){
-            objFuncLineEditList[i]->setText("0");
-        }
-
-        bool ok;
-        float temp = objFuncLineEditList[i]->text().toFloat(&ok);
-        if(!ok){
-            return objFuncLineEditList[i];
-        }
-        objFuncCoefficients.append(temp);
-    }
-
-    QVector<QVector<float>> constraintsCoefficients;
-    QVector<float> plans;
-    for(int i = 0; i < constraintsLineEditMatrix.count(); ++i){
-        QVector<float> row;
-
-        if(planLineEditVect[i]->text().isEmpty()){
-            planLineEditVect[i]->setText("0");
-        }
-
-        bool k;
-        float t = planLineEditVect[i]->text().toFloat(&k);
-        if(!k){
-            return planLineEditVect[i];
-        }
-        plans.append(t);
-
-        for(int j = 0; j < constraintsLineEditMatrix[i].count(); ++j){
-            if(constraintsLineEditMatrix[i][j]->text().isEmpty()){
-                constraintsLineEditMatrix[i][j]->setText("0");
-            }
-
-            bool ok;
-            float temp = constraintsLineEditMatrix[i][j]->text().toFloat(&ok);
-            if(!ok){
-                return constraintsLineEditMatrix[i][j];
-            }
-            row.append(temp);
-        }
-        constraintsCoefficients.append(row);
-    }
-
-    if(currentMethod == Simplex){
-        lpMethod = new NewSimplexClass(objFuncCoefficients, constraintsCoefficients, ConvertSigns(), plans);
-        qDebug() << "Simplex";
-    }
-    if(currentMethod == DualSimplex){
-        qDebug() << "Dual";
-    }
-    if(currentMethod == Method::Gomory){
-        qDebug() << "Gomory";
-    }
-
-    return nullptr;
-}
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
@@ -203,6 +142,70 @@ QVector<int> MainWindow::ConvertSigns()
     return inequalitySigns;
 }
 
+// In any line edit that is empty it automatically asumes there is supposed to be zero.
+// Returns first found invalid input line edit
+QLineEdit* MainWindow::ReadAllInputs()
+{
+    QVector<float> objFuncCoefficients;
+    for (int i = 0; i < objFuncLineEditList.count(); ++i){
+        if(objFuncLineEditList[i]->text().isEmpty()){
+            objFuncLineEditList[i]->setText("0");
+        }
+
+        bool ok;
+        float temp = objFuncLineEditList[i]->text().toFloat(&ok);
+        if(!ok){
+            return objFuncLineEditList[i];
+        }
+        objFuncCoefficients.append(temp);
+    }
+
+    QVector<QVector<float>> constraintsCoefficients;
+    QVector<float> plans;
+    for(int i = 0; i < constraintsLineEditMatrix.count(); ++i){
+        QVector<float> row;
+
+        if(planLineEditVect[i]->text().isEmpty()){
+            planLineEditVect[i]->setText("0");
+        }
+
+        bool k;
+        float t = planLineEditVect[i]->text().toFloat(&k);
+        if(!k){
+            return planLineEditVect[i];
+        }
+        plans.append(t);
+
+        for(int j = 0; j < constraintsLineEditMatrix[i].count(); ++j){
+            if(constraintsLineEditMatrix[i][j]->text().isEmpty()){
+                constraintsLineEditMatrix[i][j]->setText("0");
+            }
+
+            bool ok;
+            float temp = constraintsLineEditMatrix[i][j]->text().toFloat(&ok);
+            if(!ok){
+                return constraintsLineEditMatrix[i][j];
+            }
+            row.append(temp);
+        }
+        constraintsCoefficients.append(row);
+    }
+
+    if(currentMethod == Simplex){
+        lpMethod = new NewSimplexClass(objFuncCoefficients, constraintsCoefficients, ConvertSigns(), plans);
+        qDebug() << "Simplex";
+    }
+    if(currentMethod == DualSimplex){
+        qDebug() << "Dual";
+    }
+    if(currentMethod == Method::Gomory){
+        qDebug() << "Gomory";
+    }
+
+    return nullptr;
+}
+
+
 void MainWindow::on_calculateButton_clicked()
 {
     tables.clear();
@@ -217,7 +220,18 @@ void MainWindow::on_calculateButton_clicked()
         return;
     }
 
-    // tables = SimplexData->BuildTables();
+    if (currentMethod == Simplex){
+        if(NewSimplexClass* simplexMethod = dynamic_cast<NewSimplexClass*>(lpMethod)){
+            TableBuilder builder{lpMethod};
+
+            do
+                tables.append(builder.ConstructTable());
+            while (!simplexMethod->SolveOneStep());
+            // Last table with solution
+            tables.append(builder.ConstructTable());
+        }
+        else qDebug() << "Failed to cast LPMethod to NewSimplexClass!";
+    }
 
     for(int i = 0; i < tables.count(); ++i){
         ui->tablesStackedWidget->addWidget(tables[i]);

@@ -58,6 +58,11 @@ protected:
 
     virtual void ApplySignEffect() = 0;
 
+private:
+    void SetupConstraintsCoefficientMatrix(const QVector<QVector<float>>& otherMatrix);
+    void SetupBaseIndexes();
+    void SetupLastRow();
+
 signals:
 };
 

@@ -7,7 +7,7 @@ TableBuilder::TableBuilder(LPMethod* method, QObject *parent)
     currentMethod = method;
 }
 
-void TableBuilder::ConstructTable()
+QTableWidget* TableBuilder::ConstructTable()
 {
     // QVector<float> objFuncCoeffVector;
     // QVector<QVector<float>> constrCoeffMatrix;
@@ -23,7 +23,10 @@ void TableBuilder::ConstructTable()
     LpStructure structure = currentMethod->GetAll();
 
     int headersCount = headers.count();
-    tableWidth = structure.constrCoeffMatrix[0].count() + structure.constrCoeffMatrix.count() + headersCount;
+
+    // At this point structure.constrCoeffMatrix[0].count()
+    // has width like the functional part of table
+    tableWidth = structure.constrCoeffMatrix[0].count() + headersCount;
     // '1' is for result (Q) and lastRow
     tableLength = structure.constrCoeffMatrix.count() + 1;
 
@@ -86,4 +89,5 @@ void TableBuilder::ConstructTable()
         table->setItem(i, 1, new QTableWidgetItem(c_bStr));
         table->setItem(i, 2, new QTableWidgetItem(planStr));
     }
+    return table;
 }

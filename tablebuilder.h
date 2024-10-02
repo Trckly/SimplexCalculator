@@ -19,8 +19,8 @@ protected:
     int tableWidth = 0;
     int tableLength = 0;
 
-private:
-    void ConstructTable();
+public:
+    QTableWidget* ConstructTable();
 
 protected:
 
