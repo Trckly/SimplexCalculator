@@ -16,14 +16,23 @@ LPMethod::LPMethod(const QVector<float>& objFuncCoeffVector, const QVector<QVect
     structure.leadColIndex = 0;
     structure.resultValue = 0;
 
+    SetupConstraintsCoefficientMatrix(constrCoeffMatrix);
+
     SetupBaseIndexes();
 
     SetupLastRow();
 
     structure.ratio.resize(structure.constrCoeffMatrix.count(), 0.f);
-
-    SetupConstraintsCoefficientMatrix(constrCoeffMatrix);
 }
+
+bool LPMethod::SolveOneStep()
+{
+    CalculateLeadingElement();
+
+    return SquareRule();
+}
+
+
 
 void LPMethod::SetupConstraintsCoefficientMatrix(const QVector<QVector<float> > &otherMatrix)
 {
@@ -97,23 +106,6 @@ bool LPMethod::IsSolved()
 
     return bSolved;
 }
-
-// void LPMethod::GetAll(QVector<float> &outObjFuncCoeffVector, QVector<QVector<float>> &outConstrCoeffMatrix,
-//                        QVector<int> &outSigns, QVector<float> &outPlans, int &outLeadRowIndex, int &outLeadColIndex,
-//                        QVector<int> &outBaseIndexes, float &outResultValue, QVector<float> &outRatio,
-//                        QVector<float> &outLastRow)
-// {
-//     outObjFuncCoeffVector = objFuncCoeffVector;
-//     outConstrCoeffMatrix = constrCoeffMatrix;
-//     outSigns = signs;
-//     outPlans = plans;
-//     outLeadRowIndex = leadingRowIndex;
-//     outLeadColIndex = leadingColIndex;
-//     outBaseIndexes = baseIndexes;
-//     outResultValue = resultValue;
-//     outRatio = ratio;
-//     outLastRow = lastRow;
-// }
 
 const LpStructure& LPMethod::GetAll()
 {

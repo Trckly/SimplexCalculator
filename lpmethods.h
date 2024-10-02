@@ -25,29 +25,14 @@ public:
                        const QVector<int>& signs, const QVector<float>& plans, QObject *parent = nullptr);
 
 protected:
-    // QVector<float> objFuncCoeffVector;
-    // QVector<QVector<float>> constrCoeffMatrix;
-    // QVector<int> signs;
-    // QVector<float> plans;
-    // // Variables calculated inside
-    // QVector<float> lastRow;
-    // QVector<float> ratio;
-    // QVector<int> baseIndexes;
-    // int leadingRowIndex;
-    // int leadingColIndex;
-    // float resultValue;
-
     LpStructure structure;
 
     float leadingElement;
 
 public:
-    virtual bool SolveOneStep() = 0;
+    bool SolveOneStep();
 
-    // void GetAll(QVector<float>& outObjFuncCoeffVector, QVector<QVector<float>>& outConstrCoeffMatrix,
-    //             QVector<int>& outSigns, QVector<float>& outPlans, int& outLeadRowIndex, int& outLeadColIndex,
-    //             QVector<int>& outBaseIndexes, float& outResultValue, QVector<float>& outRatio,
-    //             QVector<float>& outLastRow);
+    virtual void CalculateLeadingElement() = 0;
 
     const LpStructure &GetAll();
 

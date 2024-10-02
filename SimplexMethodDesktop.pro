@@ -14,7 +14,6 @@ SOURCES += \
     lpmethods.cpp \
     main.cpp \
     mainwindow.cpp \
-    newsimplexclass.cpp \
     simplexclass.cpp \
     tablebuilder.cpp
 
@@ -23,7 +22,6 @@ HEADERS += \
     gomoryclass.h \
     lpmethods.h \
     mainwindow.h \
-    newsimplexclass.h \
     simplexclass.h \
     tablebuilder.h
 

@@ -11,7 +11,7 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QComboBox>
-#include "newsimplexclass.h"
+#include "simplexclass.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

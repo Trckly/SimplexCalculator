@@ -192,7 +192,7 @@ QLineEdit* MainWindow::ReadAllInputs()
     }
 
     if(currentMethod == Simplex){
-        lpMethod = new NewSimplexClass(objFuncCoefficients, constraintsCoefficients, ConvertSigns(), plans);
+        lpMethod = new SimplexClass(objFuncCoefficients, constraintsCoefficients, ConvertSigns(), plans);
         qDebug() << "Simplex";
     }
     if(currentMethod == DualSimplex){
@@ -221,7 +221,7 @@ void MainWindow::on_calculateButton_clicked()
     }
 
     if (currentMethod == Simplex){
-        if(NewSimplexClass* simplexMethod = dynamic_cast<NewSimplexClass*>(lpMethod)){
+        if(SimplexClass* simplexMethod = dynamic_cast<SimplexClass*>(lpMethod)){
             TableBuilder builder(lpMethod);
 
             int tableCounter = -1;
