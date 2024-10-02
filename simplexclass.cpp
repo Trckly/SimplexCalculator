@@ -116,9 +116,8 @@ QTableWidget *SimplexClass::ConstructTable(QPoint Dimentions, bool lastTable)
 
     table->setVerticalHeaderLabels(rowHeaders);
 
-    // Column indexes of table are depended of headers QStringList above
+    // Column indexes of table are highly depended on headers QStringList above
     for (int i = 0; i < Dimentions.rx(); ++i){
-
         // Base/c_b fill
         QString baseStr, c_bStr, planStr;
         // Without last row
@@ -126,7 +125,6 @@ QTableWidget *SimplexClass::ConstructTable(QPoint Dimentions, bool lastTable)
             baseStr = "x" + QString::number(baseIndexes[i]);
             c_bStr = QString::number(baseIndexes[i] > objFuncCoeffVector.count() ? 0 : objFuncCoeffVector[baseIndexes[i] - 1]);
             planStr = QString::number(plans[i]);
-
 
             for (int j = 0; j < Dimentions.ry() - headersCountSnapshot; ++j){
                 QString conCoeffStr;
@@ -143,6 +141,7 @@ QTableWidget *SimplexClass::ConstructTable(QPoint Dimentions, bool lastTable)
                 table->setItem(i, j + 3, new QTableWidgetItem(conCoeffStr));
             }
         }
+
         // Last row
         else{
             baseStr = "Q";
@@ -163,7 +162,6 @@ QTableWidget *SimplexClass::ConstructTable(QPoint Dimentions, bool lastTable)
 
     // Adjust the size of the cells
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    // table->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     if(!lastTable){
         leadingColIndex = GetMinColumnIndex();

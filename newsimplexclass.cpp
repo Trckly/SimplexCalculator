@@ -11,13 +11,13 @@ NewSimplexClass::NewSimplexClass(const QVector<float> &objFuncCoeffVector,
 bool NewSimplexClass::SolveOneStep()
 {
 
-    ratio.resize(objFuncCoeffVector.count(), 0.f);
+    structure.ratio.resize(structure.objFuncCoeffVector.count(), 0.f);
 
-    leadingColIndex = GetMinColumnIndex();
+    structure.leadColIndex = GetMinColumnIndex();
 
-    leadingRowIndex = GetMinRowIndex(leadingColIndex);
+    structure.leadRowIndex = GetMinRowIndex(structure.leadColIndex);
 
-    leadingElement = this->constrCoeffMatrix[leadingRowIndex][leadingColIndex];
+    leadingElement = this->structure.constrCoeffMatrix[structure.leadRowIndex][structure.leadColIndex];
 
     return SquareRule();
 }
@@ -26,14 +26,14 @@ int NewSimplexClass::GetMinColumnIndex()
 {
     float min = 0;
     int minIndex = 0;
-    for (int i = 0; i < lastRow.count(); ++i){
+    for (int i = 0; i < structure.lastRow.count(); ++i){
         if(i == 0){
-            min = lastRow[i];
+            min = structure.lastRow[i];
             minIndex = i;
             continue;
         }
-        if(lastRow[i] < min){
-            min = lastRow[i];
+        if(structure.lastRow[i] < min){
+            min = structure.lastRow[i];
             minIndex = i;
         }
     }
@@ -44,28 +44,28 @@ int NewSimplexClass::GetMinRowIndex(int colIndex)
 {
     float min = std::numeric_limits<float>::max(), tempRatio;
     int minIndex = 0;
-    for (int i = 0; i < constrCoeffMatrix.count(); ++i){
+    for (int i = 0; i < structure.constrCoeffMatrix.count(); ++i){
         tempRatio = -1;
-        if(constrCoeffMatrix[i][colIndex] > 0){
-            tempRatio = plans[i] / constrCoeffMatrix[i][colIndex];
+        if(structure.constrCoeffMatrix[i][colIndex] > 0){
+            tempRatio = structure.plans[i] / structure.constrCoeffMatrix[i][colIndex];
             if(tempRatio < min){
                 min = tempRatio;
                 minIndex = i;
             }
         }
-        ratio[i] = tempRatio;
+        structure.ratio[i] = tempRatio;
     }
     return minIndex;
 }
 
 void NewSimplexClass::ApplySignEffect()
 {
-    for (int i = 0; i < constrCoeffMatrix.count(); ++i){
-        if(signs[i] == 1){
-            for (int j = 0; j < constrCoeffMatrix[0].count(); ++j){
-                constrCoeffMatrix[i][j] *= -1;
+    for (int i = 0; i < structure.constrCoeffMatrix.count(); ++i){
+        if(structure.signs[i] == 1){
+            for (int j = 0; j < structure.constrCoeffMatrix[0].count(); ++j){
+                structure.constrCoeffMatrix[i][j] *= -1;
             }
-            plans[i] *= -1;
+            structure.plans[i] *= -1;
         }
     }
 }

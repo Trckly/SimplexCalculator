@@ -3,6 +3,20 @@
 
 #include <QObject>
 
+struct LpStructure {
+    QVector<float> objFuncCoeffVector;
+    QVector<QVector<float>> constrCoeffMatrix;
+    QVector<int> signs;
+    QVector<float> plans;
+    int leadRowIndex;
+    int leadColIndex;
+    QVector<int> baseIndexes;
+    float resultValue;
+    QVector<float> ratio;
+    QVector<float> lastRow;
+    float leadElement;
+};
+
 class LPMethod : public QObject
 {
     Q_OBJECT
@@ -11,40 +25,36 @@ public:
                        const QVector<int>& signs, const QVector<float>& plans, QObject *parent = nullptr);
 
 protected:
-    QVector<float> objFuncCoeffVector;
+    // QVector<float> objFuncCoeffVector;
+    // QVector<QVector<float>> constrCoeffMatrix;
+    // QVector<int> signs;
+    // QVector<float> plans;
+    // // Variables calculated inside
+    // QVector<float> lastRow;
+    // QVector<float> ratio;
+    // QVector<int> baseIndexes;
+    // int leadingRowIndex;
+    // int leadingColIndex;
+    // float resultValue;
 
-    QVector<QVector<float>> constrCoeffMatrix;
-
-    QVector<int> signs;
-
-    QVector<float> plans;
-
-    // Variables calculated inside
-    QVector<float> lastRow;
-
-    QVector<float> ratio;
-
-    QVector<int> baseIndexes;
+    LpStructure structure;
 
     float leadingElement;
 
-    int leadingRowIndex;
-
-    int leadingColIndex;
-
-    float resultValue;
-
-protected:
+public:
     virtual bool SolveOneStep() = 0;
 
+    // void GetAll(QVector<float>& outObjFuncCoeffVector, QVector<QVector<float>>& outConstrCoeffMatrix,
+    //             QVector<int>& outSigns, QVector<float>& outPlans, int& outLeadRowIndex, int& outLeadColIndex,
+    //             QVector<int>& outBaseIndexes, float& outResultValue, QVector<float>& outRatio,
+    //             QVector<float>& outLastRow);
+
+    LpStructure GetAll();
+
+protected:
     bool SquareRule();
 
     bool IsSolved();
-
-    void GetAll(QVector<float>& outObjFuncCoeffVector, QVector<QVector<float>>& outConstrCoeffMatrix,
-                QVector<int>& outSigns, QVector<float>& outPlans, int& outLeadRowIndex, int& outLeadColIndex,
-                QVector<int>& outBaseIndexes, float& outResultValue, QVector<float>& outRatio,
-                QVector<float>& outLastRow);
 
     virtual void ApplySignEffect() = 0;
 

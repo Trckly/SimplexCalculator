@@ -2,6 +2,7 @@
 #define TABLEBUILDER_H
 
 #include <QObject>
+#include <QTableWidget>
 #include "lpmethods.h"
 
 class TableBuilder : public QObject
@@ -13,13 +14,15 @@ public:
 protected:
     LPMethod* currentMethod;
 
+    QStringList headers = {"Base", "c_b", "Plan", "Ratio"};
+
+    int tableWidth = 0;
+    int tableLength = 0;
+
 private:
-    void MakeGeneralTable();
+    void ConstructTable();
 
 protected:
-    void ConstructSimplexTable();
-
-    void ConstructDualTable();
 
 signals:
 };
