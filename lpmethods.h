@@ -49,7 +49,7 @@ public:
     //             QVector<int>& outBaseIndexes, float& outResultValue, QVector<float>& outRatio,
     //             QVector<float>& outLastRow);
 
-    LpStructure GetAll();
+    const LpStructure &GetAll();
 
 protected:
     bool SquareRule();

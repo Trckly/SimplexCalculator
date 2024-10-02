@@ -14,6 +14,7 @@ public:
 public:
     virtual bool SolveOneStep() override;
 
+    void CalculateLeadingElement();
 
 private:
     int GetMinColumnIndex();

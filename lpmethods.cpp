@@ -20,7 +20,7 @@ LPMethod::LPMethod(const QVector<float>& objFuncCoeffVector, const QVector<QVect
 
     SetupLastRow();
 
-    structure.ratio.resize(objFuncCoeffVector.count(), 0.f);
+    structure.ratio.resize(structure.constrCoeffMatrix.count(), 0.f);
 
     SetupConstraintsCoefficientMatrix(constrCoeffMatrix);
 }
@@ -33,13 +33,17 @@ void LPMethod::SetupConstraintsCoefficientMatrix(const QVector<QVector<float> > 
     int newSize = otherMatrix.count() + structure.objFuncCoeffVector.count();
     for (int i = 0; i < otherMatrix.count(); ++i){
         structure.constrCoeffMatrix[i].resize(newSize, 0.f);
+        for (int j = structure.objFuncCoeffVector.count(); j < newSize; ++j){
+            if(i + structure.objFuncCoeffVector.count() == j)
+                structure.constrCoeffMatrix[i][j] = 1;
+        }
     }
 }
 
 void LPMethod::SetupBaseIndexes()
 {
-    for(int i = 1; i <= structure.objFuncCoeffVector.count(); ++i){
-        structure.baseIndexes.append(i + structure.objFuncCoeffVector.count());
+    for(int i = 1; i <= structure.constrCoeffMatrix.count(); ++i){
+        structure.baseIndexes.append(i + structure.constrCoeffMatrix.count());
     }
 }
 
@@ -111,7 +115,7 @@ bool LPMethod::IsSolved()
 //     outLastRow = lastRow;
 // }
 
-LpStructure LPMethod::GetAll()
+const LpStructure& LPMethod::GetAll()
 {
     return structure;
 }

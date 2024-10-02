@@ -22,6 +22,8 @@ protected:
 public:
     QTableWidget* ConstructTable();
 
+    void MarkLeadingElement(QTableWidget* tableToMark);
+
 protected:
 
 signals:

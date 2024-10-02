@@ -9,18 +9,7 @@ TableBuilder::TableBuilder(LPMethod* method, QObject *parent)
 
 QTableWidget* TableBuilder::ConstructTable()
 {
-    // QVector<float> objFuncCoeffVector;
-    // QVector<QVector<float>> constrCoeffMatrix;
-    // QVector<int> signs;
-    // QVector<float> plans;
-    // int leadRowIndex;
-    // int leadColIndex;
-    // QVector<int> baseIndexes;
-    // float resultValue;
-    // QVector<float> ratio;
-    // QVector<float> lastRow;
-
-    LpStructure structure = currentMethod->GetAll();
+    const LpStructure& structure = currentMethod->GetAll();
 
     int headersCount = headers.count();
 
@@ -60,16 +49,7 @@ QTableWidget* TableBuilder::ConstructTable()
 
             for (int j = 0; j < tableWidth - headersCount; ++j){
                 QString conCoeffStr;
-                if(j < structure.objFuncCoeffVector.count()){
                     conCoeffStr = QString::number(structure.constrCoeffMatrix[i][j]);
-                }
-                else if(j + 1 == structure.baseIndexes[i]){
-                    conCoeffStr = "1";
-                    structure.constrCoeffMatrix[i][j] = 1.f;
-                }
-                else{
-                    conCoeffStr = QString::number(structure.constrCoeffMatrix[i][j]);
-                }
                 table->setItem(i, j + 3, new QTableWidgetItem(conCoeffStr));
             }
         }
@@ -89,5 +69,31 @@ QTableWidget* TableBuilder::ConstructTable()
         table->setItem(i, 1, new QTableWidgetItem(c_bStr));
         table->setItem(i, 2, new QTableWidgetItem(planStr));
     }
+
+    // Ensure all cells are initialized with empty items if not explicitly set
+    for (int i = 0; i < table->rowCount(); ++i) {
+        for (int j = 0; j < table->columnCount(); ++j) {
+            if (!table->item(i, j)) {
+                table->setItem(i, j, new QTableWidgetItem(""));  // Set empty item if none exists
+            }
+        }
+    }
     return table;
+}
+
+void TableBuilder::MarkLeadingElement(QTableWidget *tableToMark)
+{
+    if(!tableToMark){
+        qDebug() << "tableToMark is null";
+        return;
+    }
+
+    const LpStructure structure = currentMethod->GetAll();
+
+    // '3' because 'Base', 'c_b' and 'Plan' are before coefficients
+    int offset = 3;
+    if(QTableWidgetItem* item = tableToMark->item(structure.leadRowIndex, structure.leadColIndex + offset))
+        item->setBackground(QBrush(QColor(200, 255, 200)));
+    else qDebug() << "Table item is null" << tableToMark->rowCount() << " " << tableToMark->columnCount()
+                 << "\n" << structure.leadRowIndex << " " << structure.leadColIndex;
 }

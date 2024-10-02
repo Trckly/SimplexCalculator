@@ -222,10 +222,15 @@ void MainWindow::on_calculateButton_clicked()
 
     if (currentMethod == Simplex){
         if(NewSimplexClass* simplexMethod = dynamic_cast<NewSimplexClass*>(lpMethod)){
-            TableBuilder builder{lpMethod};
+            TableBuilder builder(lpMethod);
 
-            do
+            int tableCounter = -1;
+            do{
                 tables.append(builder.ConstructTable());
+                if(tableCounter >= 0)
+                    builder.MarkLeadingElement(tables[tableCounter]);
+                tableCounter++;
+            }
             while (!simplexMethod->SolveOneStep());
             // Last table with solution
             tables.append(builder.ConstructTable());
