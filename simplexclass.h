@@ -1,64 +1,29 @@
-#pragma once
+#ifndef SIMPLEXCLASS_H
+#define SIMPLEXCLASS_H
 
 #include <QObject>
-#include <QComboBox>
-#include <QDebug>
-#include <QTableWidget>
-#include <QVector2D>
-#include <QTableWidgetItem>
+#include "lpmethods.h"
 
-class SimplexClass : public QObject
+class SimplexClass : public LPMethod
 {
     Q_OBJECT
 public:
-    explicit SimplexClass(QObject *parent = nullptr);
-    SimplexClass(QVector<float> objCoeffVector, QVector<QVector<float>> constrCoeffVector, QVector<QComboBox*> signsVector, QVector<float> plansVector);
-
-protected:
-    QVector<float> objFuncCoeffVector;
-
-    QVector<QVector<float>> constrCoeffMatrix;
-
-    QVector<int> signs;
-
-    QVector<float> plans;
-
-    QVector<int> baseIndexes;
-
-    float QValue = 0;
-
-    QVector<float> lastRow;
-
-    QVector<float> ratio;
-
-    float leadingElement;
-
-    int leadingColIndex;
-
-    int leadingRowIndex;
+    explicit SimplexClass(const QVector<float>& objFuncCoeffVector, const QVector<QVector<float>>& constrCoeffMatrix,
+                             const QVector<int>& signs, const QVector<float>& plans, QObject *parent = nullptr);
 
 public:
-    void SetObjectiveCoefficientVector(QVector<float> otherVector);
 
-    void SetConstraintsCoefficientMatrix(QVector<QVector<float>> otherMatrix);
+private:
+    int GetMinColumnIndex();
 
-    void SetSigns(QVector<QComboBox*> signsComboBoxVector);
+    int GetMinRowIndex(int colIndex);
 
-    void SetPlans(QVector<float> otherVector);
-
-    QVector<QTableWidget*> BuildTables();
-
-    QPoint CalculateTableDimentions();
-
-    QTableWidget* ConstructTable(QPoint Dimentions, bool lastTable);
-
-    bool SimplexAlgorithm();
-
-    int GetMinRowIndex(float *minValue = nullptr);
-
-    int GetMinColumnIndex(int rowIndex, float *minValue = nullptr);
-
-    bool IsSolved();
+protected:
+    virtual void CalculateLeadingElement() override;
+    virtual void RatioSetup() override;
+    virtual bool IsSolved() override;
 
 signals:
 };
+
+#endif // SIMPLEXCLASS_H

@@ -19,6 +19,12 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
+enum Method{
+    Simplex,
+    DualSimplex,
+    Gomory
+};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -38,6 +44,8 @@ protected:
 
     void AppendConstraint();
 
+    QVector<int> ConvertSigns();
+
     static void Transpose(QVector<QVector<float>> &vectorToTranspose);
 
 private slots:
@@ -50,6 +58,8 @@ private slots:
 
     void on_coeffCountSpinBox_valueChanged(int arg1);
 
+    void on_methodComboBox_currentIndexChanged(int index);
+
 private:
     Ui::MainWindow *ui;
 
@@ -57,11 +67,11 @@ private:
 
     const int COEFFICIENTS_COUNT = 2;
 
-    QVector<QLineEdit*> ObjFuncLineEditList;
+    LPMethod* lpMethod = nullptr;
 
-    QVector<QVector<QLineEdit*>> ConstraintsLineEditMatrix;
+    QVector<QLineEdit*> objFuncLineEditList;
 
-    SimplexClass* SimplexData = nullptr;
+    QVector<QVector<QLineEdit*>> constraintsLineEditMatrix;
 
     QLineEdit* prevFalseLineEdit = nullptr;
 
@@ -69,6 +79,8 @@ private:
 
     QVector<QLineEdit*> planLineEditVect;
 
-    QVector<QTableWidget*> Tables;
+    QVector<QTableWidget*> tables;
+
+    Method currentMethod;
 };
 #endif // MAINWINDOW_H

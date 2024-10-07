@@ -1,4 +1,6 @@
 #include "mainwindow.h"
+#include "dualsimplexclass.h"
+#include "tablebuilder.h"
 #include "ui_mainwindow.h"
 
 void clearLayout(QHBoxLayout*);
@@ -8,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    ui->methodComboBox->addItems({"Simplex", "DualSimplex", "Gomory"});
 
     ui->coeffCountSpinBox->setMinimum(2);
 
@@ -32,67 +36,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-// In any line edit that is empty it automatically asumes there is supposed to be zero.
-// Returns first found invalid input line edit
-QLineEdit* MainWindow::ReadAllInputs()
-{
-    QVector<float> objFuncCoefficients;
-    QVector<QVector<float>> constraintsCoefficients;
-    QVector<float> plans;
-
-    for (int i = 0; i < ObjFuncLineEditList.count(); ++i){
-        if(ObjFuncLineEditList[i]->text().isEmpty()){
-            ObjFuncLineEditList[i]->setText("0");
-        }
-
-        bool ok;
-        float temp = ObjFuncLineEditList[i]->text().toFloat(&ok);
-        if(!ok){
-            return ObjFuncLineEditList[i];
-        }
-        plans.append(-temp);
-    }
-
-
-    for(int i = 0; i < ConstraintsLineEditMatrix.count(); ++i){
-        QVector<float> row;
-
-        if(planLineEditVect[i]->text().isEmpty()){
-            planLineEditVect[i]->setText("0");
-        }
-
-        bool k;
-        float t = planLineEditVect[i]->text().toFloat(&k);
-        if(!k){
-            return planLineEditVect[i];
-        }
-        objFuncCoefficients.append(-t);
-
-        for(int j = 0; j < ConstraintsLineEditMatrix[i].count(); ++j){
-            if(ConstraintsLineEditMatrix[i][j]->text().isEmpty()){
-                ConstraintsLineEditMatrix[i][j]->setText("0");
-            }
-
-            bool ok;
-            float temp = ConstraintsLineEditMatrix[i][j]->text().toFloat(&ok);
-            if(!ok){
-                return ConstraintsLineEditMatrix[i][j];
-            }
-            if(inequalitySignComboBoxVect[i]->currentIndex() == 0)
-                row.append(-temp);
-            else
-                row.append(temp);
-        }
-        constraintsCoefficients.append(row);
-    }
-
-    // Transpose constraints
-    Transpose(constraintsCoefficients);
-
-    SimplexData = new SimplexClass(objFuncCoefficients, constraintsCoefficients, inequalitySignComboBoxVect, plans);
-
-    return nullptr;
-}
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
@@ -125,13 +68,13 @@ void MainWindow::onAddCoefficientButtonClicked()
 
 void MainWindow::SetCoefficientsCount(int num)
 {
-    ObjFuncLineEditList.clear();
+    objFuncLineEditList.clear();
     clearLayout(ui->objectiveFunctionLayout);
 
     for (int i = 0; i < num; ++i){
         QLineEdit* LineEdit = new QLineEdit(this);
         LineEdit->setFixedSize(BOX_WIDTH, BOX_HEIGHT);
-        ObjFuncLineEditList.append(LineEdit);
+        objFuncLineEditList.append(LineEdit);
 
         QLabel* label = new QLabel;
         QString str;
@@ -188,12 +131,86 @@ void MainWindow::AppendConstraint()
     planLineEditVect.append(plan);
     HBoxLayout->addWidget(plan);
 
-    ConstraintsLineEditMatrix.append(currentConstraintLineEditList);
+    constraintsLineEditMatrix.append(currentConstraintLineEditList);
 }
+
+QVector<int> MainWindow::ConvertSigns()
+{
+    QVector<int> inequalitySigns;
+    for (QComboBox* signComboBox : inequalitySignComboBoxVect){
+        inequalitySigns.append(signComboBox->currentIndex());
+    }
+    return inequalitySigns;
+}
+
+// In any line edit that is empty it automatically asumes there is supposed to be zero.
+// Returns first found invalid input line edit
+QLineEdit* MainWindow::ReadAllInputs()
+{
+    QVector<float> objFuncCoefficients;
+    for (int i = 0; i < objFuncLineEditList.count(); ++i){
+        if(objFuncLineEditList[i]->text().isEmpty()){
+            objFuncLineEditList[i]->setText("0");
+        }
+
+        bool ok;
+        float temp = objFuncLineEditList[i]->text().toFloat(&ok);
+        if(!ok){
+            return objFuncLineEditList[i];
+        }
+        objFuncCoefficients.append(temp);
+    }
+
+    QVector<QVector<float>> constraintsCoefficients;
+    QVector<float> plans;
+    for(int i = 0; i < constraintsLineEditMatrix.count(); ++i){
+        QVector<float> row;
+
+        if(planLineEditVect[i]->text().isEmpty()){
+            planLineEditVect[i]->setText("0");
+        }
+
+        bool k;
+        float t = planLineEditVect[i]->text().toFloat(&k);
+        if(!k){
+            return planLineEditVect[i];
+        }
+        plans.append(t);
+
+        for(int j = 0; j < constraintsLineEditMatrix[i].count(); ++j){
+            if(constraintsLineEditMatrix[i][j]->text().isEmpty()){
+                constraintsLineEditMatrix[i][j]->setText("0");
+            }
+
+            bool ok;
+            float temp = constraintsLineEditMatrix[i][j]->text().toFloat(&ok);
+            if(!ok){
+                return constraintsLineEditMatrix[i][j];
+            }
+            row.append(temp);
+        }
+        constraintsCoefficients.append(row);
+    }
+
+    if(currentMethod == Simplex){
+        lpMethod = new SimplexClass(objFuncCoefficients, constraintsCoefficients, ConvertSigns(), plans);
+        qDebug() << "Simplex";
+    }
+    if(currentMethod == DualSimplex){
+        lpMethod = new DualSimplexClass(objFuncCoefficients, constraintsCoefficients, ConvertSigns(), plans);
+        qDebug() << "Dual";
+    }
+    if(currentMethod == Method::Gomory){
+        qDebug() << "Gomory";
+    }
+
+    return nullptr;
+}
+
 
 void MainWindow::on_calculateButton_clicked()
 {
-    Tables.clear();
+    tables.clear();
 
     if(prevFalseLineEdit){
         prevFalseLineEdit->setStyleSheet("");
@@ -205,10 +222,25 @@ void MainWindow::on_calculateButton_clicked()
         return;
     }
 
-    Tables = SimplexData->BuildTables();
+    // Building logic
+    TableBuilder builder(lpMethod);
 
-    for(int i = 0; i < Tables.count(); ++i){
-        ui->tablesStackedWidget->addWidget(Tables[i]);
+    int tableCounter = -1;
+    do{
+        tables.append(builder.ConstructTable());
+        if(tableCounter >= 0)
+            builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
+        tableCounter++;
+    }
+    while (!lpMethod->SolveOneStep());
+
+    // Last table with solution
+    tables.append(builder.ConstructTable());
+    builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
+
+
+    for(int i = 0; i < tables.count(); ++i){
+        ui->tablesStackedWidget->addWidget(tables[i]);
     }
 
     QString tableStr = "CT-1";
@@ -268,3 +300,9 @@ void clearLayout(QHBoxLayout* layout) {
         delete item;  // Delete the layout item
     }
 }
+
+void MainWindow::on_methodComboBox_currentIndexChanged(int index)
+{
+    currentMethod = static_cast<Method>(index);
+}
+
