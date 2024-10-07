@@ -14,7 +14,10 @@ public:
 protected:
     LPMethod* currentMethod;
 
-    QStringList headers = {"Base", "c_b", "Plan", "Ratio"};
+    int initialHeadersCount;
+
+    QStringList initHeaders = {"Base", "c_b", "Plan"};
+    QStringList currentHeaders;
 
     int tableWidth = 0;
     int tableLength = 0;
@@ -24,9 +27,8 @@ public:
 
     void MarkLeadingElement(QTableWidget* tableToMark);
 
-protected:
-
-signals:
+private:
+    void AppendRatio(QTableWidget* table, const LpStructure& structure);
 };
 
 #endif // TABLEBUILDER_H

@@ -1,15 +1,26 @@
-#ifndef DUALSIMPLEXCLASS_H
-#define DUALSIMPLEXCLASS_H
+#pragma once
 
 #include "QObject"
+#include "lpmethods.h"
 
-class DualSimplexClass : public QObject
+class DualSimplexClass : public LPMethod
 {
     Q_OBJECT
 public:
-    explicit DualSimplexClass(QObject *parent = nullptr);
+    explicit DualSimplexClass(const QVector<float>& objFuncCoeffVector, const QVector<QVector<float>>& constrCoeffMatrix,
+                              const QVector<int>& signs, const QVector<float>& plans, QObject *parent = nullptr);
 
-signals:
+private:
+    int GetMinColumnIndex(int rowIndex);
+
+    int GetMinRowIndex();
+
+    void TransposeConstrCoefficients();
+
+    void SwapObjFuncWithPlans();
+
+    void BringToCanonical();
+
+protected:
+    virtual void CalculateLeadingElement() override;
 };
-
-#endif // DUALSIMPLEXCLASS_H

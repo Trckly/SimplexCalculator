@@ -1,5 +1,5 @@
 #include "tablebuilder.h"
-
+#include "simplexclass.h"
 
 TableBuilder::TableBuilder(LPMethod* method, QObject *parent)
     : QObject{parent}
@@ -11,22 +11,21 @@ QTableWidget* TableBuilder::ConstructTable()
 {
     const LpStructure& structure = currentMethod->GetAll();
 
-    int headersCount = headers.count();
-
     // At this point structure.constrCoeffMatrix[0].count()
     // has width like the functional part of table
-    tableWidth = structure.constrCoeffMatrix[0].count() + headersCount;
+    tableWidth = structure.constrCoeffMatrix[0].count() + initHeaders.count();
     // '1' is for result (Q) and lastRow
     tableLength = structure.constrCoeffMatrix.count() + 1;
 
     QTableWidget* table = new QTableWidget(tableLength, tableWidth);
 
-    for (int i = 0; i < tableWidth - headersCount; ++i){
+    currentHeaders = initHeaders;
+    for (int i = 0; i < tableWidth - initHeaders.count(); ++i){
         QString str = "x" + QString::number(i+1);
-        headers.insert(headers.count() - 1, str);
+        currentHeaders.append(str);
     }
 
-    table->setHorizontalHeaderLabels(headers);
+    table->setHorizontalHeaderLabels(currentHeaders);
 
     QStringList rowHeaders;
     for (int i = 0; i < table->rowCount(); ++i){
@@ -47,7 +46,7 @@ QTableWidget* TableBuilder::ConstructTable()
                                          : structure.objFuncCoeffVector[structure.baseIndexes[i] - 1]);
             planStr = QString::number(structure.plans[i]);
 
-            for (int j = 0; j < tableWidth - headersCount; ++j){
+            for (int j = 0; j < tableWidth - initHeaders.count(); ++j){
                 QString conCoeffStr;
                     conCoeffStr = QString::number(structure.constrCoeffMatrix[i][j]);
                 table->setItem(i, j + 3, new QTableWidgetItem(conCoeffStr));
@@ -70,14 +69,6 @@ QTableWidget* TableBuilder::ConstructTable()
         table->setItem(i, 2, new QTableWidgetItem(planStr));
     }
 
-    // Ensure all cells are initialized with empty items if not explicitly set
-    for (int i = 0; i < table->rowCount(); ++i) {
-        for (int j = 0; j < table->columnCount(); ++j) {
-            if (!table->item(i, j)) {
-                table->setItem(i, j, new QTableWidgetItem(""));  // Set empty item if none exists
-            }
-        }
-    }
     return table;
 }
 
@@ -96,4 +87,24 @@ void TableBuilder::MarkLeadingElement(QTableWidget *tableToMark)
         item->setBackground(QBrush(QColor(200, 255, 200)));
     else qDebug() << "Table item is null" << tableToMark->rowCount() << " " << tableToMark->columnCount()
                  << "\n" << structure.leadRowIndex << " " << structure.leadColIndex;
+
+    AppendRatio(tableToMark, structure);
+}
+
+void TableBuilder::AppendRatio(QTableWidget* table, const LpStructure& structure)
+{
+    if(dynamic_cast<SimplexClass*>(currentMethod)){
+        // Append horizontal ratio
+        QStringList headersWithRatio = currentHeaders;
+        headersWithRatio.append("Ratio");
+        int newTableWidth = headersWithRatio.count();
+
+        table->setColumnCount(newTableWidth);
+        table->setHorizontalHeaderLabels(headersWithRatio);
+
+        int j = table->columnCount() - 1;
+        for (int i = 0; i < structure.ratio.count(); ++i){
+            table->setItem(i, j, new QTableWidgetItem(QString::number(structure.ratio[i])));
+        }
+    }
 }

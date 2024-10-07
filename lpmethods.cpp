@@ -107,6 +107,18 @@ bool LPMethod::IsSolved()
     return bSolved;
 }
 
+void LPMethod::ApplySignEffect()
+{
+    for (int i = 0; i < structure.constrCoeffMatrix.count(); ++i){
+        if(structure.signs[i] == 1){
+            for (int j = 0; j < structure.objFuncCoeffVector.count(); ++j){
+                structure.constrCoeffMatrix[i][j] *= -1;
+            }
+            structure.plans[i] *= -1;
+        }
+    }
+}
+
 const LpStructure& LPMethod::GetAll()
 {
     return structure;

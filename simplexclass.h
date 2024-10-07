@@ -18,8 +18,6 @@ private:
 
     int GetMinRowIndex(int colIndex);
 
-    virtual void ApplySignEffect() override;
-
     virtual void CalculateLeadingElement() override;
 
 signals:

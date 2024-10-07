@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "dualsimplexclass.h"
 #include "tablebuilder.h"
 #include "ui_mainwindow.h"
 
@@ -196,6 +197,7 @@ QLineEdit* MainWindow::ReadAllInputs()
         qDebug() << "Simplex";
     }
     if(currentMethod == DualSimplex){
+        lpMethod = new DualSimplexClass(objFuncCoefficients, constraintsCoefficients, ConvertSigns(), plans);
         qDebug() << "Dual";
     }
     if(currentMethod == Method::Gomory){
@@ -228,12 +230,34 @@ void MainWindow::on_calculateButton_clicked()
             do{
                 tables.append(builder.ConstructTable());
                 if(tableCounter >= 0)
-                    builder.MarkLeadingElement(tables[tableCounter]);
+                    builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
                 tableCounter++;
             }
             while (!simplexMethod->SolveOneStep());
+
             // Last table with solution
             tables.append(builder.ConstructTable());
+            builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
+        }
+        else qDebug() << "Failed to cast LPMethod to NewSimplexClass!";
+    }
+
+    if (currentMethod == DualSimplex){
+        if(SimplexClass* simplexMethod = dynamic_cast<SimplexClass*>(lpMethod)){
+            TableBuilder builder(lpMethod);
+
+            int tableCounter = -1;
+            do{
+                tables.append(builder.ConstructTable());
+                if(tableCounter >= 0)
+                    builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
+                tableCounter++;
+            }
+            while (!simplexMethod->SolveOneStep());
+
+            // Last table with solution
+            tables.append(builder.ConstructTable());
+            builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
         }
         else qDebug() << "Failed to cast LPMethod to NewSimplexClass!";
     }

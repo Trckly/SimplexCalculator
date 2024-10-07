@@ -41,7 +41,7 @@ protected:
 
     bool IsSolved();
 
-    virtual void ApplySignEffect() = 0;
+    void ApplySignEffect();
 
 private:
     void SetupConstraintsCoefficientMatrix(const QVector<QVector<float>>& otherMatrix);
