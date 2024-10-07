@@ -115,8 +115,14 @@ void TableBuilder::AppendRatio(QTableWidget* table, const LpStructure& structure
         table->setRowCount(newRowCount);
 
         int offset = initHeaders.count();
+        QString ratioStr;
         for (int i = 0; i < structure.ratio.count(); ++i){
-            table->setItem(newRowCount - 1, i + offset, new QTableWidgetItem(QString::number(structure.ratio[i])));
+            ratioStr = structure.ratio[i] < 0 ? "-" : QString::number(structure.ratio[i]);
+
+            table->setItem(newRowCount - 1, i + offset, new QTableWidgetItem());
+
+            if(i == 0)
+                table->setItem(newRowCount - 1, i, new QTableWidgetItem("Ratio"));
         }
     }
 }
