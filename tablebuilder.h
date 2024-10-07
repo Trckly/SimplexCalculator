@@ -14,8 +14,6 @@ public:
 protected:
     LPMethod* currentMethod;
 
-    int initialHeadersCount;
-
     QStringList initHeaders = {"Base", "c_b", "Plan"};
     QStringList currentHeaders;
 

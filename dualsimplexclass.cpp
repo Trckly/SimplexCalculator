@@ -11,6 +11,10 @@ DualSimplexClass::DualSimplexClass(const QVector<float> &objFuncCoeffVector, con
     TransposeConstrCoefficients();
 
     BringToCanonical();
+
+    // It is being called in inherited class because matrix need to be transposed
+    // before setup
+    SetupConstraintsCoefficientMatrix(constrCoeffMatrix);
 }
 
 int DualSimplexClass::GetMinColumnIndex(int rowIndex)
@@ -82,7 +86,7 @@ void DualSimplexClass::BringToCanonical()
     }
 
     for(int i = 0; i < structure.constrCoeffMatrix.count(); ++i){
-        for (int j = 0; j < structure.constrCoeffMatrix[0].count(); ++j){
+        for (int j = 0; j < structure.objFuncCoeffVector.count(); ++j){
             structure.constrCoeffMatrix[i][j] *= -1;
         }
     }

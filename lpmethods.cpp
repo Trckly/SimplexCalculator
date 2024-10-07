@@ -16,8 +16,6 @@ LPMethod::LPMethod(const QVector<float>& objFuncCoeffVector, const QVector<QVect
     structure.leadColIndex = 0;
     structure.resultValue = 0;
 
-    SetupConstraintsCoefficientMatrix(constrCoeffMatrix);
-
     SetupBaseIndexes();
 
     SetupLastRow();

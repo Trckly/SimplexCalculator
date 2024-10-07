@@ -43,8 +43,9 @@ protected:
 
     void ApplySignEffect();
 
-private:
     void SetupConstraintsCoefficientMatrix(const QVector<QVector<float>>& otherMatrix);
+
+private:   
     void SetupBaseIndexes();
     void SetupLastRow();
 

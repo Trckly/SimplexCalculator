@@ -4,6 +4,10 @@ SimplexClass::SimplexClass(const QVector<float> &objFuncCoeffVector, const QVect
                                  const QVector<int> &signs, const QVector<float> &plans, QObject *parent)
     : LPMethod(objFuncCoeffVector, constrCoeffMatrix, signs, plans, parent)
 {
+    // It is being called in inherited class because other inherited classes
+    // need to process this info after e.g. transpose of a matrix
+    SetupConstraintsCoefficientMatrix(constrCoeffMatrix);
+
     ApplySignEffect();
 }
 

@@ -222,45 +222,22 @@ void MainWindow::on_calculateButton_clicked()
         return;
     }
 
-    if (currentMethod == Simplex){
-        if(SimplexClass* simplexMethod = dynamic_cast<SimplexClass*>(lpMethod)){
-            TableBuilder builder(lpMethod);
+    // Building logic
+    TableBuilder builder(lpMethod);
 
-            int tableCounter = -1;
-            do{
-                tables.append(builder.ConstructTable());
-                if(tableCounter >= 0)
-                    builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
-                tableCounter++;
-            }
-            while (!simplexMethod->SolveOneStep());
-
-            // Last table with solution
-            tables.append(builder.ConstructTable());
+    int tableCounter = -1;
+    do{
+        tables.append(builder.ConstructTable());
+        if(tableCounter >= 0)
             builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
-        }
-        else qDebug() << "Failed to cast LPMethod to NewSimplexClass!";
+        tableCounter++;
     }
+    while (!lpMethod->SolveOneStep());
 
-    if (currentMethod == DualSimplex){
-        if(SimplexClass* simplexMethod = dynamic_cast<SimplexClass*>(lpMethod)){
-            TableBuilder builder(lpMethod);
+    // Last table with solution
+    tables.append(builder.ConstructTable());
+    builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
 
-            int tableCounter = -1;
-            do{
-                tables.append(builder.ConstructTable());
-                if(tableCounter >= 0)
-                    builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
-                tableCounter++;
-            }
-            while (!simplexMethod->SolveOneStep());
-
-            // Last table with solution
-            tables.append(builder.ConstructTable());
-            builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
-        }
-        else qDebug() << "Failed to cast LPMethod to NewSimplexClass!";
-    }
 
     for(int i = 0; i < tables.count(); ++i){
         ui->tablesStackedWidget->addWidget(tables[i]);

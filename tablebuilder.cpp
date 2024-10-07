@@ -1,4 +1,5 @@
 #include "tablebuilder.h"
+#include "dualsimplexclass.h"
 #include "simplexclass.h"
 
 TableBuilder::TableBuilder(LPMethod* method, QObject *parent)
@@ -97,14 +98,25 @@ void TableBuilder::AppendRatio(QTableWidget* table, const LpStructure& structure
         // Append horizontal ratio
         QStringList headersWithRatio = currentHeaders;
         headersWithRatio.append("Ratio");
-        int newTableWidth = headersWithRatio.count();
+        int newColumnCount= headersWithRatio.count();
 
-        table->setColumnCount(newTableWidth);
+        table->setColumnCount(newColumnCount);
         table->setHorizontalHeaderLabels(headersWithRatio);
 
         int j = table->columnCount() - 1;
         for (int i = 0; i < structure.ratio.count(); ++i){
             table->setItem(i, j, new QTableWidgetItem(QString::number(structure.ratio[i])));
+        }
+    }
+
+    if(dynamic_cast<DualSimplexClass*>(currentMethod)){
+        // Append vertical ratio
+        int newRowCount = table->rowCount() + 1;
+        table->setRowCount(newRowCount);
+
+        int offset = initHeaders.count();
+        for (int i = 0; i < structure.ratio.count(); ++i){
+            table->setItem(newRowCount - 1, i + offset, new QTableWidgetItem(QString::number(structure.ratio[i])));
         }
     }
 }
