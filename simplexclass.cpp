@@ -4,11 +4,9 @@ SimplexClass::SimplexClass(const QVector<float> &objFuncCoeffVector, const QVect
                                  const QVector<int> &signs, const QVector<float> &plans, QObject *parent)
     : LPMethod(objFuncCoeffVector, constrCoeffMatrix, signs, plans, parent)
 {
-    // It is being called in inherited class because other inherited classes
-    // need to process this info after e.g. transpose of a matrix
-    SetupConstraintsCoefficientMatrix(constrCoeffMatrix);
-
     ApplySignEffect();
+
+    GeneralSetup();
 }
 
 int SimplexClass::GetMinColumnIndex()
@@ -51,5 +49,20 @@ void SimplexClass::CalculateLeadingElement()
 {
     structure.leadColIndex = GetMinColumnIndex();
     structure.leadRowIndex = GetMinRowIndex(structure.leadColIndex);
-    leadingElement = structure.constrCoeffMatrix[structure.leadRowIndex][structure.leadColIndex];
+    structure.leadElement = structure.constrCoeffMatrix[structure.leadRowIndex][structure.leadColIndex];
+}
+
+void SimplexClass::RatioSetup()
+{
+    structure.ratio.resize(structure.constrCoeffMatrix.count(), 0.f);
+}
+
+bool SimplexClass::IsSolved()
+{
+    bool bSolved = true;
+    for (int i = 0; i < structure.lastRow.count(); ++i){
+        structure.lastRow[i] < 0 ? bSolved = false : bSolved;
+    }
+
+    return bSolved;
 }

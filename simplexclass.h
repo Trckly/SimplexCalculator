@@ -18,7 +18,10 @@ private:
 
     int GetMinRowIndex(int colIndex);
 
+protected:
     virtual void CalculateLeadingElement() override;
+    virtual void RatioSetup() override;
+    virtual bool IsSolved() override;
 
 signals:
 };

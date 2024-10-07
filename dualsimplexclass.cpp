@@ -12,9 +12,7 @@ DualSimplexClass::DualSimplexClass(const QVector<float> &objFuncCoeffVector, con
 
     BringToCanonical();
 
-    // It is being called in inherited class because matrix need to be transposed
-    // before setup
-    SetupConstraintsCoefficientMatrix(constrCoeffMatrix);
+    GeneralSetup();
 }
 
 int DualSimplexClass::GetMinColumnIndex(int rowIndex)
@@ -24,7 +22,7 @@ int DualSimplexClass::GetMinColumnIndex(int rowIndex)
     for (int i = 0; i < structure.constrCoeffMatrix[0].count(); ++i){
         tempRatio = -1;
         if(structure.constrCoeffMatrix[rowIndex][i] < 0){
-            tempRatio = -structure.lastRow[i] / structure.constrCoeffMatrix[rowIndex][i];
+            tempRatio = structure.lastRow[i] / structure.constrCoeffMatrix[rowIndex][i];
             if(tempRatio < min){
                 min = tempRatio;
                 minIndex = i;
@@ -37,12 +35,11 @@ int DualSimplexClass::GetMinColumnIndex(int rowIndex)
 
 int DualSimplexClass::GetMinRowIndex()
 {
-    float min = 0;
+    float min = std::numeric_limits<float>::max();
     int minIndex = 0;
     for (int i = 0; i < structure.plans.count(); ++i){
         if(i == 0){
             min = structure.plans[i];
-            minIndex = i;
             continue;
         }
         if(structure.plans[i] < min){
@@ -96,5 +93,20 @@ void DualSimplexClass::CalculateLeadingElement()
 {
     structure.leadRowIndex = GetMinRowIndex();
     structure.leadColIndex = GetMinColumnIndex(structure.leadRowIndex);
-    leadingElement = structure.constrCoeffMatrix[structure.leadRowIndex][structure.leadColIndex];
+    structure.leadElement = structure.constrCoeffMatrix[structure.leadRowIndex][structure.leadColIndex];
+}
+
+void DualSimplexClass::RatioSetup()
+{
+    structure.ratio.resize(structure.constrCoeffMatrix[0].count(), 0.f);
+}
+
+bool DualSimplexClass::IsSolved()
+{
+    bool bSolved = true;
+    for (int i = 0; i < structure.plans.count(); ++i){
+        structure.plans[i] < 0 ? bSolved = false : bSolved;
+    }
+
+    return bSolved;
 }

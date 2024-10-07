@@ -15,12 +15,6 @@ LPMethod::LPMethod(const QVector<float>& objFuncCoeffVector, const QVector<QVect
     structure.leadRowIndex = 0;
     structure.leadColIndex = 0;
     structure.resultValue = 0;
-
-    SetupBaseIndexes();
-
-    SetupLastRow();
-
-    structure.ratio.resize(structure.constrCoeffMatrix.count(), 0.f);
 }
 
 bool LPMethod::SolveOneStep()
@@ -32,19 +26,28 @@ bool LPMethod::SolveOneStep()
 
 
 
-void LPMethod::SetupConstraintsCoefficientMatrix(const QVector<QVector<float> > &otherMatrix)
+void LPMethod::SetupConstraintsCoefficientMatrix()
 {
-    structure.constrCoeffMatrix.clear();
-    structure.constrCoeffMatrix = otherMatrix;
-
-    int newSize = otherMatrix.count() + structure.objFuncCoeffVector.count();
-    for (int i = 0; i < otherMatrix.count(); ++i){
+    int newSize = structure.constrCoeffMatrix.count() + structure.objFuncCoeffVector.count();
+    for (int i = 0; i < structure.constrCoeffMatrix.count(); ++i){
         structure.constrCoeffMatrix[i].resize(newSize, 0.f);
         for (int j = structure.objFuncCoeffVector.count(); j < newSize; ++j){
             if(i + structure.objFuncCoeffVector.count() == j)
                 structure.constrCoeffMatrix[i][j] = 1;
         }
     }
+}
+
+// To be called in child constructors because thay can change initial structure
+void LPMethod::GeneralSetup()
+{
+    SetupConstraintsCoefficientMatrix();
+
+    SetupBaseIndexes();
+
+    SetupLastRow();
+
+    RatioSetup();
 }
 
 void LPMethod::SetupBaseIndexes()
@@ -65,10 +68,10 @@ void LPMethod::SetupLastRow()
 bool LPMethod::SquareRule()
 {
     for (int j = 0; j < structure.constrCoeffMatrix[0].count(); ++j) {
-        structure.constrCoeffMatrix[structure.leadRowIndex][j] /= leadingElement;
+        structure.constrCoeffMatrix[structure.leadRowIndex][j] /= structure.leadElement;
     }
 
-    structure.plans[structure.leadRowIndex] /= leadingElement;
+    structure.plans[structure.leadRowIndex] /= structure.leadElement;
 
     for (int i = 0; i <= structure.constrCoeffMatrix.count(); ++i){
         if (i == structure.leadRowIndex){
@@ -93,16 +96,6 @@ bool LPMethod::SquareRule()
     }
 
     return IsSolved();
-}
-
-bool LPMethod::IsSolved()
-{
-    bool bSolved = true;
-    for (int i = 0; i < structure.lastRow.count(); ++i){
-        structure.lastRow[i] < 0 ? bSolved = false : bSolved;
-    }
-
-    return bSolved;
 }
 
 void LPMethod::ApplySignEffect()

@@ -39,15 +39,19 @@ public:
 protected:
     bool SquareRule();
 
-    bool IsSolved();
+    virtual bool IsSolved() = 0;
 
     void ApplySignEffect();
 
-    void SetupConstraintsCoefficientMatrix(const QVector<QVector<float>>& otherMatrix);
+    // To be called in child constructors because thay can change initial structure
+    void GeneralSetup();
+
+    virtual void RatioSetup() = 0;
 
 private:   
     void SetupBaseIndexes();
     void SetupLastRow();
+    void SetupConstraintsCoefficientMatrix();
 
 signals:
 };

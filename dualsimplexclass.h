@@ -23,4 +23,6 @@ private:
 
 protected:
     virtual void CalculateLeadingElement() override;
+    virtual void RatioSetup() override;
+    virtual bool IsSolved() override;
 };

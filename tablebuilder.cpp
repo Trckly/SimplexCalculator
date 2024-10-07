@@ -85,7 +85,7 @@ void TableBuilder::MarkLeadingElement(QTableWidget *tableToMark)
     // '3' because 'Base', 'c_b' and 'Plan' are before coefficients
     int offset = 3;
     if(QTableWidgetItem* item = tableToMark->item(structure.leadRowIndex, structure.leadColIndex + offset))
-        item->setBackground(QBrush(QColor(200, 255, 200)));
+        item->setBackground(QBrush(QColor(0, 125, 0)));
     else qDebug() << "Table item is null" << tableToMark->rowCount() << " " << tableToMark->columnCount()
                  << "\n" << structure.leadRowIndex << " " << structure.leadColIndex;
 
