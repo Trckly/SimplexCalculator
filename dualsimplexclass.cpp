@@ -12,6 +12,9 @@ DualSimplexClass::DualSimplexClass(const LpStructure &otherStructure) : LPMethod
     InitializeClass();
 }
 
+DualSimplexClass::DualSimplexClass() : LPMethod()
+{}
+
 void DualSimplexClass::InitializeClass()
 {
     ApplySignEffect();

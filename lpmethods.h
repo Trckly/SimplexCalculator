@@ -26,6 +26,8 @@ public:
 
     LPMethod(const LpStructure& otherStructure);
 
+    LPMethod();
+
 protected:
     LpStructure structure;
 
@@ -35,6 +37,8 @@ public:
     virtual bool SolveOneStep();
 
     const LpStructure &GetAll();
+
+    virtual void InjectStructure(const LpStructure& otherStructure);
 
 protected:
     bool SquareRule();
@@ -51,8 +55,6 @@ protected:
     virtual void RatioSetup() = 0;
 
     virtual void CalculateLeadingElement() = 0;
-
-    virtual void InjectStructure(const LpStructure& otherStructure);
 
 private:   
     void SetupBaseIndexes();

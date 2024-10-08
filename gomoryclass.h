@@ -3,15 +3,18 @@
 #include <QObject>
 #include "lpmethods.h"
 
-class Gomoryclass : public LPMethod
+class GomoryClass : public LPMethod
 {
     Q_OBJECT
 public:
-    explicit Gomoryclass(const QVector<float>& objFuncCoeffVector, const QVector<QVector<float>>& constrCoeffMatrix,
+    explicit GomoryClass(const QVector<float>& objFuncCoeffVector, const QVector<QVector<float>>& constrCoeffMatrix,
                          const QVector<int>& signs, const QVector<float>& plans, QObject *parent = nullptr);
 
 private:
     LPMethod* activeLpMethod;
+
+    bool bSimplexSolved;
+    void InitializeClass();
 
 protected:
     float plansFraction;
@@ -21,12 +24,21 @@ protected:
 public:
     virtual bool SolveOneStep() override;
 
+    LPMethod *GetCurrentMethod();
+
 protected:
     virtual bool IsSolved() override;
 
+    virtual void RatioSetup() override;
+
+    virtual void CalculateLeadingElement() override;
+
 private:
     bool SolveSimplexOneStep();
-
     void MakeConstraint();
     void InsertConstraint();
+    void CorrectRatio();
+    void CorrectConstrCoeffMatrix();
+    void CorrectLastRow();
+    void CorrectBaseIndexes();
 };

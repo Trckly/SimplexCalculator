@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "dualsimplexclass.h"
+#include "gomoryclass.h"
 #include "tablebuilder.h"
 #include "ui_mainwindow.h"
 
@@ -201,6 +202,7 @@ QLineEdit* MainWindow::ReadAllInputs()
         qDebug() << "Dual";
     }
     if(currentMethod == Method::Gomory){
+        lpMethod = new GomoryClass(objFuncCoefficients, constraintsCoefficients, ConvertSigns(), plans);
         qDebug() << "Gomory";
     }
 

@@ -1,5 +1,6 @@
 #include "tablebuilder.h"
 #include "dualsimplexclass.h"
+#include "gomoryclass.h"
 #include "simplexclass.h"
 
 TableBuilder::TableBuilder(LPMethod* method, QObject *parent)
@@ -94,7 +95,14 @@ void TableBuilder::MarkLeadingElement(QTableWidget *tableToMark)
 
 void TableBuilder::AppendRatio(QTableWidget* table, const LpStructure& structure)
 {
-    if(dynamic_cast<SimplexClass*>(currentMethod)){
+    LPMethod* method;
+
+    if(auto GomoryMethod = dynamic_cast<GomoryClass*>(currentMethod))
+        method = GomoryMethod->GetCurrentMethod();
+    else
+        method = currentMethod;
+
+    if(dynamic_cast<SimplexClass*>(method)){
         // Append horizontal ratio
         QStringList headersWithRatio = currentHeaders;
         headersWithRatio.append("Ratio");
@@ -109,7 +117,7 @@ void TableBuilder::AppendRatio(QTableWidget* table, const LpStructure& structure
         }
     }
 
-    if(dynamic_cast<DualSimplexClass*>(currentMethod)){
+    if(dynamic_cast<DualSimplexClass*>(method)){
         // Append vertical ratio
         int newRowCount = table->rowCount() + 1;
         table->setRowCount(newRowCount);

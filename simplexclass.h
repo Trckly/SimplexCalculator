@@ -11,6 +11,7 @@ public:
     explicit SimplexClass(const QVector<float>& objFuncCoeffVector, const QVector<QVector<float>>& constrCoeffMatrix,
                              const QVector<int>& signs, const QVector<float>& plans, QObject *parent = nullptr);
     SimplexClass(const LpStructure& otherStructure);
+    SimplexClass();
 
 public:
 

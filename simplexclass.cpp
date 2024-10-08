@@ -8,9 +8,10 @@ SimplexClass::SimplexClass(const QVector<float> &objFuncCoeffVector, const QVect
 }
 
 SimplexClass::SimplexClass(const LpStructure &otherStructure) : LPMethod(otherStructure)
-{
-    InitializeClass();
-}
+{}
+
+SimplexClass::SimplexClass() : LPMethod()
+{}
 
 void SimplexClass::InitializeClass()
 {

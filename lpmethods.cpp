@@ -19,7 +19,15 @@ LPMethod::LPMethod(const QVector<float>& objFuncCoeffVector, const QVector<QVect
 
 LPMethod::LPMethod(const LpStructure &otherStructure)
 {
-    SafeInjectStructure(otherStructure);
+    structure = otherStructure;
+}
+
+LPMethod::LPMethod()
+{
+    structure.leadElement = 0.f;
+    structure.leadRowIndex = 0;
+    structure.leadColIndex = 0;
+    structure.resultValue = 0;
 }
 
 bool LPMethod::SolveOneStep()
@@ -45,17 +53,19 @@ void LPMethod::SetupConstraintsCoefficientMatrix()
 
 void LPMethod::SafeInjectStructure(const LpStructure &otherStructure)
 {
-    structure.objFuncCoeffVector = otherStructure.objFuncCoeffVector;
-    structure.constrCoeffMatrix = otherStructure.constrCoeffMatrix;
-    structure.signs = otherStructure.signs;
-    structure.plans = otherStructure.plans;
-    structure.lastRow = otherStructure.lastRow;
-    structure.baseIndexes = otherStructure.baseIndexes;
-    structure.resultValue = otherStructure.resultValue;
-    structure.leadElement = 0.f;
-    structure.leadRowIndex = 0;
-    structure.leadColIndex = 0;
-    structure.ratio.clear();
+    // structure.objFuncCoeffVector = otherStructure.objFuncCoeffVector;
+    // structure.constrCoeffMatrix = otherStructure.constrCoeffMatrix;
+    // structure.signs = otherStructure.signs;
+    // structure.plans = otherStructure.plans;
+    // structure.lastRow = otherStructure.lastRow;
+    // structure.baseIndexes = otherStructure.baseIndexes;
+    // structure.resultValue = otherStructure.resultValue;
+    // structure.ratio = otherStructure.ratio;
+    // structure.leadElement = 0.f;
+    // structure.leadRowIndex = 0;
+    // structure.leadColIndex = 0;
+
+    structure = otherStructure;
 }
 
 void LPMethod::InjectStructure(const LpStructure &otherStructure)
