@@ -1,7 +1,7 @@
 #include "simplexclass.h"
 
-SimplexClass::SimplexClass(const QVector<float> &objFuncCoeffVector, const QVector<QVector<float> > &constrCoeffMatrix,
-                                 const QVector<int> &signs, const QVector<float> &plans, QObject *parent)
+SimplexClass::SimplexClass(const QVector<double> &objFuncCoeffVector, const QVector<QVector<double> > &constrCoeffMatrix,
+                                 const QVector<int> &signs, const QVector<double> &plans, QObject *parent)
     : LPMethod(objFuncCoeffVector, constrCoeffMatrix, signs, plans, parent)
 {
     InitializeClass();
@@ -22,7 +22,7 @@ void SimplexClass::InitializeClass()
 
 int SimplexClass::GetMinColumnIndex()
 {
-    float min = 0;
+    double min = 0;
     int minIndex = 0;
     for (int i = 0; i < structure.lastRow.count(); ++i){
         if(i == 0){
@@ -40,7 +40,7 @@ int SimplexClass::GetMinColumnIndex()
 
 int SimplexClass::GetMinRowIndex(int colIndex)
 {
-    float min = std::numeric_limits<float>::max(), tempRatio;
+    double min = std::numeric_limits<double>::max(), tempRatio;
     int minIndex = 0;
     for (int i = 0; i < structure.constrCoeffMatrix.count(); ++i){
         tempRatio = -1;

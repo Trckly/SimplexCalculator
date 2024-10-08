@@ -5,9 +5,9 @@
 #include "simplexclass.h"
 #include "dualsimplexclass.h"
 
-float GetFraction(float num);
+double GetFraction(double num);
 
-GomoryClass::GomoryClass(const QVector<float> &objFuncCoeffVector, const QVector<QVector<float> > &constrCoeffMatrix, const QVector<int> &signs, const QVector<float> &plans, QObject *parent)
+GomoryClass::GomoryClass(const QVector<double> &objFuncCoeffVector, const QVector<QVector<double> > &constrCoeffMatrix, const QVector<int> &signs, const QVector<double> &plans, QObject *parent)
     : LPMethod(objFuncCoeffVector, constrCoeffMatrix, signs, plans, parent)
 {
     InitializeClass();
@@ -15,6 +15,7 @@ GomoryClass::GomoryClass(const QVector<float> &objFuncCoeffVector, const QVector
     activeLpMethod = new SimplexClass(structure);
 
     bSimplexSolved = false;
+    bDualSolved = false;
 }
 
 void GomoryClass::InitializeClass()
@@ -29,7 +30,7 @@ bool GomoryClass::SolveOneStep()
     if(!bSimplexSolved){
         bSimplexSolved = SolveSimplexOneStep();
         structure = activeLpMethod->GetAll();
-        return IsSolved();
+        return false;
     }
 
     if(dynamic_cast<SimplexClass*>(activeLpMethod)){
@@ -45,7 +46,14 @@ bool GomoryClass::SolveOneStep()
 
     // Solve for DualSimplex
     if(activeLpMethod){
-        activeLpMethod->SolveOneStep();
+        if(bDualSolved){
+            MakeConstraint();
+            InsertConstraint();
+            bDualSolved = !bDualSolved;
+        }
+
+        activeLpMethod->InjectStructure(structure);
+        bDualSolved = activeLpMethod->SolveOneStep();
         structure = activeLpMethod->GetAll();
     }
 
@@ -92,7 +100,7 @@ bool GomoryClass::SolveSimplexOneStep()
 
 void GomoryClass::MakeConstraint()
 {
-    float max = std::numeric_limits<float>::min();
+    double max = std::numeric_limits<double>::min();
     for (int i = 0; i < structure.plans.count(); ++i){
         if(i == 0){
             max = GetFraction(structure.plans[i]);
@@ -105,8 +113,9 @@ void GomoryClass::MakeConstraint()
     }
     plansFraction = -max;
 
+    fractions.clear();
     for (int i = 0; i < structure.constrCoeffMatrix[rowIndex].count(); ++i){
-        fractions.append(GetFraction(structure.constrCoeffMatrix[rowIndex][i]));
+        fractions.append(-GetFraction(structure.constrCoeffMatrix[rowIndex][i]));
     }
 }
 
@@ -148,9 +157,9 @@ void GomoryClass::CorrectLastRow()
 
 void GomoryClass::CorrectBaseIndexes()
 {
-    structure.baseIndexes.append(structure.constrCoeffMatrix[0].count() - 1);
+    structure.baseIndexes.append(structure.constrCoeffMatrix[0].count() - 2);
 }
 
-float GetFraction(float num){
+double GetFraction(double num){
     return num - (int)num;
 }

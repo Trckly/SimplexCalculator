@@ -46,7 +46,7 @@ protected:
 
     QVector<int> ConvertSigns();
 
-    static void Transpose(QVector<QVector<float>> &vectorToTranspose);
+    static void Transpose(QVector<QVector<double>> &vectorToTranspose);
 
 private slots:
 

@@ -7,18 +7,20 @@ class GomoryClass : public LPMethod
 {
     Q_OBJECT
 public:
-    explicit GomoryClass(const QVector<float>& objFuncCoeffVector, const QVector<QVector<float>>& constrCoeffMatrix,
-                         const QVector<int>& signs, const QVector<float>& plans, QObject *parent = nullptr);
+    explicit GomoryClass(const QVector<double>& objFuncCoeffVector, const QVector<QVector<double>>& constrCoeffMatrix,
+                         const QVector<int>& signs, const QVector<double>& plans, QObject *parent = nullptr);
 
 private:
     LPMethod* activeLpMethod;
 
     bool bSimplexSolved;
+    bool bDualSolved;
+
     void InitializeClass();
 
 protected:
-    float plansFraction;
-    QVector<float> fractions;
+    double plansFraction;
+    QVector<double> fractions;
     int rowIndex;
 
 public:

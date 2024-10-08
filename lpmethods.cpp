@@ -1,7 +1,7 @@
 #include "lpmethods.h"
 
-LPMethod::LPMethod(const QVector<float>& objFuncCoeffVector, const QVector<QVector<float>>& constrCoeffMatrix,
-                     const QVector<int>& signs, const QVector<float>& plans, QObject *parent)
+LPMethod::LPMethod(const QVector<double>& objFuncCoeffVector, const QVector<QVector<double>>& constrCoeffMatrix,
+                     const QVector<int>& signs, const QVector<double>& plans, QObject *parent)
     : QObject{parent}
 {
     structure.objFuncCoeffVector = objFuncCoeffVector;
@@ -115,14 +115,14 @@ bool LPMethod::SquareRule()
         }
 
         if(i < structure.constrCoeffMatrix.count()){
-            float rowFactor = structure.constrCoeffMatrix[i][structure.leadColIndex];
+            double rowFactor = structure.constrCoeffMatrix[i][structure.leadColIndex];
             for (int j = 0; j < structure.constrCoeffMatrix[0].count(); ++j){
                 structure.constrCoeffMatrix[i][j] -= rowFactor * structure.constrCoeffMatrix[structure.leadRowIndex][j];
             }
             structure.plans[i] -= rowFactor * structure.plans[structure.leadRowIndex];
         }
         else{
-            float rowFactor = structure.lastRow[structure.leadColIndex];
+            double rowFactor = structure.lastRow[structure.leadColIndex];
             for (int j = 0; j < structure.lastRow.count(); ++j){
                 structure.lastRow[j] -= rowFactor * structure.constrCoeffMatrix[structure.leadRowIndex][j];
             }

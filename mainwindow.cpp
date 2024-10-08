@@ -148,31 +148,31 @@ QVector<int> MainWindow::ConvertSigns()
 // Returns first found invalid input line edit
 QLineEdit* MainWindow::ReadAllInputs()
 {
-    QVector<float> objFuncCoefficients;
+    QVector<double> objFuncCoefficients;
     for (int i = 0; i < objFuncLineEditList.count(); ++i){
         if(objFuncLineEditList[i]->text().isEmpty()){
             objFuncLineEditList[i]->setText("0");
         }
 
         bool ok;
-        float temp = objFuncLineEditList[i]->text().toFloat(&ok);
+        double temp = objFuncLineEditList[i]->text().toFloat(&ok);
         if(!ok){
             return objFuncLineEditList[i];
         }
         objFuncCoefficients.append(temp);
     }
 
-    QVector<QVector<float>> constraintsCoefficients;
-    QVector<float> plans;
+    QVector<QVector<double>> constraintsCoefficients;
+    QVector<double> plans;
     for(int i = 0; i < constraintsLineEditMatrix.count(); ++i){
-        QVector<float> row;
+        QVector<double> row;
 
         if(planLineEditVect[i]->text().isEmpty()){
             planLineEditVect[i]->setText("0");
         }
 
         bool k;
-        float t = planLineEditVect[i]->text().toFloat(&k);
+        double t = planLineEditVect[i]->text().toFloat(&k);
         if(!k){
             return planLineEditVect[i];
         }
@@ -184,7 +184,7 @@ QLineEdit* MainWindow::ReadAllInputs()
             }
 
             bool ok;
-            float temp = constraintsLineEditMatrix[i][j]->text().toFloat(&ok);
+            double temp = constraintsLineEditMatrix[i][j]->text().toFloat(&ok);
             if(!ok){
                 return constraintsLineEditMatrix[i][j];
             }
@@ -271,13 +271,13 @@ void MainWindow::on_nextTable_clicked()
     ui->tableLabel->setText(tableStr);
 }
 
-void MainWindow::Transpose(QVector<QVector<float>> &vectorToTranspose)
+void MainWindow::Transpose(QVector<QVector<double>> &vectorToTranspose)
 {
-    const QVector<QVector<float>> temp = vectorToTranspose;
+    const QVector<QVector<double>> temp = vectorToTranspose;
     vectorToTranspose.clear();
 
     for (int i = 0; i < temp[0].count(); ++i){
-        QVector<float> row;
+        QVector<double> row;
         for (int j = 0; j < temp.count(); ++j){
             row.append(temp[j][i]);
         }
