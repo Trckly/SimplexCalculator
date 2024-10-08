@@ -4,6 +4,16 @@ DualSimplexClass::DualSimplexClass(const QVector<float> &objFuncCoeffVector, con
                                    const QVector<int> &signs, const QVector<float> &plans, QObject *parent)
     : LPMethod(objFuncCoeffVector, constrCoeffMatrix, signs, plans, parent)
 {
+    InitializeClass();
+}
+
+DualSimplexClass::DualSimplexClass(const LpStructure &otherStructure) : LPMethod(otherStructure)
+{
+    InitializeClass();
+}
+
+void DualSimplexClass::InitializeClass()
+{
     ApplySignEffect();
 
     SwapObjFuncWithPlans();

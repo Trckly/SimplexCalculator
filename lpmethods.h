@@ -24,15 +24,15 @@ public:
     explicit LPMethod(const QVector<float>& objFuncCoeffVector, const QVector<QVector<float>>& constrCoeffMatrix,
                        const QVector<int>& signs, const QVector<float>& plans, QObject *parent = nullptr);
 
+    LPMethod(const LpStructure& otherStructure);
+
 protected:
     LpStructure structure;
 
     float leadingElement;
 
 public:
-    bool SolveOneStep();
-
-    virtual void CalculateLeadingElement() = 0;
+    virtual bool SolveOneStep();
 
     const LpStructure &GetAll();
 
@@ -46,7 +46,13 @@ protected:
     // To be called in child constructors because thay can change initial structure
     void GeneralSetup();
 
+    void SafeInjectStructure(const LpStructure& otherStructure);
+
     virtual void RatioSetup() = 0;
+
+    virtual void CalculateLeadingElement() = 0;
+
+    virtual void InjectStructure(const LpStructure& otherStructure);
 
 private:   
     void SetupBaseIndexes();

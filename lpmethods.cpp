@@ -17,6 +17,11 @@ LPMethod::LPMethod(const QVector<float>& objFuncCoeffVector, const QVector<QVect
     structure.resultValue = 0;
 }
 
+LPMethod::LPMethod(const LpStructure &otherStructure)
+{
+    SafeInjectStructure(otherStructure);
+}
+
 bool LPMethod::SolveOneStep()
 {
     CalculateLeadingElement();
@@ -36,6 +41,26 @@ void LPMethod::SetupConstraintsCoefficientMatrix()
                 structure.constrCoeffMatrix[i][j] = 1;
         }
     }
+}
+
+void LPMethod::SafeInjectStructure(const LpStructure &otherStructure)
+{
+    structure.objFuncCoeffVector = otherStructure.objFuncCoeffVector;
+    structure.constrCoeffMatrix = otherStructure.constrCoeffMatrix;
+    structure.signs = otherStructure.signs;
+    structure.plans = otherStructure.plans;
+    structure.lastRow = otherStructure.lastRow;
+    structure.baseIndexes = otherStructure.baseIndexes;
+    structure.resultValue = otherStructure.resultValue;
+    structure.leadElement = 0.f;
+    structure.leadRowIndex = 0;
+    structure.leadColIndex = 0;
+    structure.ratio.clear();
+}
+
+void LPMethod::InjectStructure(const LpStructure &otherStructure)
+{
+    SafeInjectStructure(otherStructure);
 }
 
 // To be called in child constructors because thay can change initial structure

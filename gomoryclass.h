@@ -1,15 +1,32 @@
-#ifndef GOMORYCLASS_H
-#define GOMORYCLASS_H
+#pragma once
 
 #include <QObject>
+#include "lpmethods.h"
 
-class Gomoryclass : public QObject
+class Gomoryclass : public LPMethod
 {
     Q_OBJECT
 public:
-    explicit Gomoryclass(QObject *parent = nullptr);
+    explicit Gomoryclass(const QVector<float>& objFuncCoeffVector, const QVector<QVector<float>>& constrCoeffMatrix,
+                         const QVector<int>& signs, const QVector<float>& plans, QObject *parent = nullptr);
 
-signals:
+private:
+    LPMethod* activeLpMethod;
+
+protected:
+    float plansFraction;
+    QVector<float> fractions;
+    int rowIndex;
+
+public:
+    virtual bool SolveOneStep() override;
+
+protected:
+    virtual bool IsSolved() override;
+
+private:
+    bool SolveSimplexOneStep();
+
+    void MakeConstraint();
+    void InsertConstraint();
 };
-
-#endif // GOMORYCLASS_H

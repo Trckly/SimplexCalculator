@@ -4,6 +4,16 @@ SimplexClass::SimplexClass(const QVector<float> &objFuncCoeffVector, const QVect
                                  const QVector<int> &signs, const QVector<float> &plans, QObject *parent)
     : LPMethod(objFuncCoeffVector, constrCoeffMatrix, signs, plans, parent)
 {
+    InitializeClass();
+}
+
+SimplexClass::SimplexClass(const LpStructure &otherStructure) : LPMethod(otherStructure)
+{
+    InitializeClass();
+}
+
+void SimplexClass::InitializeClass()
+{
     ApplySignEffect();
 
     GeneralSetup();

@@ -10,10 +10,13 @@ class SimplexClass : public LPMethod
 public:
     explicit SimplexClass(const QVector<float>& objFuncCoeffVector, const QVector<QVector<float>>& constrCoeffMatrix,
                              const QVector<int>& signs, const QVector<float>& plans, QObject *parent = nullptr);
+    SimplexClass(const LpStructure& otherStructure);
 
 public:
 
 private:
+    void InitializeClass();
+
     int GetMinColumnIndex();
 
     int GetMinRowIndex(int colIndex);
@@ -23,7 +26,6 @@ protected:
     virtual void RatioSetup() override;
     virtual bool IsSolved() override;
 
-signals:
 };
 
 #endif // SIMPLEXCLASS_H
