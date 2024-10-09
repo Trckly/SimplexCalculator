@@ -1,7 +1,7 @@
 #include "lpmethods.h"
 
-LPMethod::LPMethod(const QVector<float>& objFuncCoeffVector, const QVector<QVector<float>>& constrCoeffMatrix,
-                     const QVector<int>& signs, const QVector<float>& plans, QObject *parent)
+LPMethod::LPMethod(const QVector<double>& objFuncCoeffVector, const QVector<QVector<double>>& constrCoeffMatrix,
+                     const QVector<int>& signs, const QVector<double>& plans, QObject *parent)
     : QObject{parent}
 {
     structure.objFuncCoeffVector = objFuncCoeffVector;
@@ -11,6 +11,19 @@ LPMethod::LPMethod(const QVector<float>& objFuncCoeffVector, const QVector<QVect
     structure.lastRow.clear();
     structure.ratio.clear();
     structure.baseIndexes.clear();
+    structure.leadElement = 0.f;
+    structure.leadRowIndex = 0;
+    structure.leadColIndex = 0;
+    structure.resultValue = 0;
+}
+
+LPMethod::LPMethod(const LpStructure &otherStructure)
+{
+    structure = otherStructure;
+}
+
+LPMethod::LPMethod()
+{
     structure.leadElement = 0.f;
     structure.leadRowIndex = 0;
     structure.leadColIndex = 0;
@@ -36,6 +49,28 @@ void LPMethod::SetupConstraintsCoefficientMatrix()
                 structure.constrCoeffMatrix[i][j] = 1;
         }
     }
+}
+
+void LPMethod::SafeInjectStructure(const LpStructure &otherStructure)
+{
+    // structure.objFuncCoeffVector = otherStructure.objFuncCoeffVector;
+    // structure.constrCoeffMatrix = otherStructure.constrCoeffMatrix;
+    // structure.signs = otherStructure.signs;
+    // structure.plans = otherStructure.plans;
+    // structure.lastRow = otherStructure.lastRow;
+    // structure.baseIndexes = otherStructure.baseIndexes;
+    // structure.resultValue = otherStructure.resultValue;
+    // structure.ratio = otherStructure.ratio;
+    // structure.leadElement = 0.f;
+    // structure.leadRowIndex = 0;
+    // structure.leadColIndex = 0;
+
+    structure = otherStructure;
+}
+
+void LPMethod::InjectStructure(const LpStructure &otherStructure)
+{
+    SafeInjectStructure(otherStructure);
 }
 
 // To be called in child constructors because thay can change initial structure
@@ -80,14 +115,14 @@ bool LPMethod::SquareRule()
         }
 
         if(i < structure.constrCoeffMatrix.count()){
-            float rowFactor = structure.constrCoeffMatrix[i][structure.leadColIndex];
+            double rowFactor = structure.constrCoeffMatrix[i][structure.leadColIndex];
             for (int j = 0; j < structure.constrCoeffMatrix[0].count(); ++j){
                 structure.constrCoeffMatrix[i][j] -= rowFactor * structure.constrCoeffMatrix[structure.leadRowIndex][j];
             }
             structure.plans[i] -= rowFactor * structure.plans[structure.leadRowIndex];
         }
         else{
-            float rowFactor = structure.lastRow[structure.leadColIndex];
+            double rowFactor = structure.lastRow[structure.leadColIndex];
             for (int j = 0; j < structure.lastRow.count(); ++j){
                 structure.lastRow[j] -= rowFactor * structure.constrCoeffMatrix[structure.leadRowIndex][j];
             }
