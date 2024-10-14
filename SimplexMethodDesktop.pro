@@ -15,8 +15,9 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     simplexclass.cpp \
-    simplextablebuilder.cpp \
-    transportationtablebuilder.cpp
+    TableBuilders/simplextablebuilder.cpp \
+    TableBuilders/transportationtablebuilder.cpp \
+    transportpotentialmethod.cpp
 
 HEADERS += \
     Dialogs/TransportationDialog.h \
@@ -25,8 +26,9 @@ HEADERS += \
     lpmethods.h \
     mainwindow.h \
     simplexclass.h \
-    simplextablebuilder.h \
-    transportationtablebuilder.h
+    TableBuilders/simplextablebuilder.h \
+    TableBuilders/transportationtablebuilder.h \
+    transportpotentialmethod.h
 
 FORMS += \
     mainwindow.ui

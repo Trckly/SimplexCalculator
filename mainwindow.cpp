@@ -3,8 +3,8 @@
 #include "Dialogs/TransportationDialog.h"
 #include "dualsimplexclass.h"
 #include "gomoryclass.h"
-#include "simplextablebuilder.h"
-#include "transportationtablebuilder.h"
+#include "TableBuilders/simplextablebuilder.h"
+#include "TableBuilders/transportationtablebuilder.h"
 #include "ui_mainwindow.h"
 
 void clearLayout(QHBoxLayout*);
