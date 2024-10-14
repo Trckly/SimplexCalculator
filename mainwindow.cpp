@@ -5,6 +5,7 @@
 #include "gomoryclass.h"
 #include "TableBuilders/simplextablebuilder.h"
 #include "TableBuilders/transportationtablebuilder.h"
+#include "transportpotentialmethod.h"
 #include "ui_mainwindow.h"
 
 void clearLayout(QHBoxLayout*);
@@ -220,32 +221,40 @@ void MainWindow::on_calculateButton_clicked()
 {
     ClearUI();
 
-    if(prevFalseLineEdit){
-        prevFalseLineEdit->setStyleSheet("");
-    }
+    if(currentMethod != PotentialsTransportation) {
 
-    if(QLineEdit* falseLineEdit = ReadAllInputs()){
-        prevFalseLineEdit = falseLineEdit;
-        prevFalseLineEdit->setStyleSheet("QLineEdit { background-color: red; }");
-        return;
-    }
+        if(prevFalseLineEdit){
+            prevFalseLineEdit->setStyleSheet("");
+        }
 
-    // Building logic
-    SimplexTableBuilder builder(lpMethod);
+        if(QLineEdit* falseLineEdit = ReadAllInputs()){
+            prevFalseLineEdit = falseLineEdit;
+            prevFalseLineEdit->setStyleSheet("QLineEdit { background-color: red; }");
+            return;
+        }
 
-    int tableCounter = -1;
-    do{
+        // Building logic
+        SimplexTableBuilder builder(lpMethod);
+
+        int tableCounter = -1;
+        do{
+            tables.append(builder.ConstructTable());
+            if(tableCounter >= 0)
+                builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
+            tableCounter++;
+        }
+        while (!lpMethod->SolveOneStep());
+
+        // Last table with solution
         tables.append(builder.ConstructTable());
-        if(tableCounter >= 0)
-            builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
-        tableCounter++;
+        builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
     }
-    while (!lpMethod->SolveOneStep());
+    else if(currentMethod == PotentialsTransportation){
+        if(auto transportationMethod = new TransportPotentialMethod(tables.first())){
 
-    // Last table with solution
-    tables.append(builder.ConstructTable());
-    builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
+        }
 
+    }
 
     for(int i = 0; i < tables.count(); ++i){
         ui->tablesStackedWidget->addWidget(tables[i]);
@@ -311,16 +320,19 @@ void clearLayout(QHBoxLayout* layout) {
     while ((item = layout->takeAt(0)) != nullptr) {
         QWidget* widget = item->widget();
         if (widget) {
-            widget->hide();   // Hide the widget (optional)
-            widget->deleteLater();  // Schedule widget for deletion
+            widget->hide();
+            widget->deleteLater();
         }
-        delete item;  // Delete the layout item
+        delete item;
     }
 }
 
 void MainWindow::on_methodComboBox_currentIndexChanged(int index)
 {
+    ClearUI();
+
     currentMethod = static_cast<Method>(index);
+
     if(currentMethod == PotentialsTransportation){
         ClearUI();
 

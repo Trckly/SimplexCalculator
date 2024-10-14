@@ -8,8 +8,23 @@ QTableWidget *TransportationTableBuilder::CreateInitialTable(int rows, int colum
 {
     QTableWidget* table = new QTableWidget;
 
-    table->setRowCount(rows);
-    table->setColumnCount(columns);
+    QStringList verticalHeaderLabels;
+    for (int i = 0; i < rows; ++i){
+        verticalHeaderLabels.append(QChar(65+i));
+    }
+    verticalHeaderLabels.append("Demand");
+
+    QStringList horizontalHeaderLabels;
+    for (int i = 0; i < columns; ++i){
+        horizontalHeaderLabels.append(QString::number(i + 1));
+    }
+    horizontalHeaderLabels.append("Supply");
+
+    table->setRowCount(rows + 1);
+    table->setColumnCount(columns + 1);
+
+    table->setVerticalHeaderLabels(verticalHeaderLabels);
+    table->setHorizontalHeaderLabels(horizontalHeaderLabels);
 
     return table;
 }
