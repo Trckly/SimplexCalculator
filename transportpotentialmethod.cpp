@@ -33,5 +33,38 @@ void TransportPotentialMethod::ReadTransportationTable(QTableWidget* srcTable)
 
 void TransportPotentialMethod::NorthWestCorner()
 {
+    int jFillOffset = -1;
 
+    QVector<double> tempSupply = supply;
+    QVector<double> tempDemand = demand;
+
+    QVector<double> demandSupplyRow;
+
+    for (int i = 0; i < supply.count(); ++i){
+        bool bFillRow = false;
+
+        for (int j = 0 ; j < demand.count(); ++j){
+            double leftover = tempSupply[i] - tempDemand[j];
+
+            if(j == jFillOffset || bFillRow){
+                demandSupplyRow.append(0);
+                continue;
+            }
+
+            if(leftover >= 0){
+                jFillOffset++;
+                demandSupplyRow.append(tempDemand[j]);
+
+                tempSupply[i] = leftover;
+                tempDemand[j] = 0;
+            }
+            else {
+                bFillRow = true;
+                demandSupplyRow.append(tempSupply[i]);
+
+                tempSupply[i] = 0;
+                tempDemand[j] = -leftover;
+            }
+        }
+    }
 }
