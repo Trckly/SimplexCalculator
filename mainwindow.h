@@ -22,7 +22,8 @@ QT_END_NAMESPACE
 enum Method{
     Simplex,
     DualSimplex,
-    Gomory
+    Gomory,
+    PotentialsTransportation
 };
 
 class MainWindow : public QMainWindow
@@ -47,6 +48,9 @@ protected:
     QVector<int> ConvertSigns();
 
     static void Transpose(QVector<QVector<double>> &vectorToTranspose);
+
+    // General
+    void ClearUI();
 
 private slots:
 

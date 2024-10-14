@@ -1,15 +1,15 @@
-#include "tablebuilder.h"
+#include "simplextablebuilder.h"
 #include "dualsimplexclass.h"
 #include "gomoryclass.h"
 #include "simplexclass.h"
 
-TableBuilder::TableBuilder(LPMethod* method, QObject *parent)
+SimplexTableBuilder::SimplexTableBuilder(LPMethod* method, QObject *parent)
     : QObject{parent}
 {
     currentMethod = method;
 }
 
-QTableWidget* TableBuilder::ConstructTable()
+QTableWidget* SimplexTableBuilder::ConstructTable()
 {
     const LpStructure& structure = currentMethod->GetAll();
 
@@ -74,7 +74,7 @@ QTableWidget* TableBuilder::ConstructTable()
     return table;
 }
 
-void TableBuilder::MarkLeadingElement(QTableWidget *tableToMark)
+void SimplexTableBuilder::MarkLeadingElement(QTableWidget *tableToMark)
 {
     if(!tableToMark){
         qDebug() << "tableToMark is null";
@@ -93,7 +93,7 @@ void TableBuilder::MarkLeadingElement(QTableWidget *tableToMark)
     AppendRatio(tableToMark, structure);
 }
 
-void TableBuilder::AppendRatio(QTableWidget* table, const LpStructure& structure)
+void SimplexTableBuilder::AppendRatio(QTableWidget* table, const LpStructure& structure)
 {
     LPMethod* method;
 

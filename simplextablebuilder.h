@@ -1,15 +1,15 @@
-#ifndef TABLEBUILDER_H
-#define TABLEBUILDER_H
+#ifndef SIMPLEXTABLEBUILDER_H
+#define SIMPLEXTABLEBUILDER_H
 
 #include <QObject>
 #include <QTableWidget>
 #include "lpmethods.h"
 
-class TableBuilder : public QObject
+class SimplexTableBuilder : public QObject
 {
     Q_OBJECT
 public:
-    explicit TableBuilder(LPMethod* method, QObject *parent = nullptr);
+    explicit SimplexTableBuilder(LPMethod* method, QObject *parent = nullptr);
 
 protected:
     LPMethod* currentMethod;
@@ -29,4 +29,4 @@ private:
     void AppendRatio(QTableWidget* table, const LpStructure& structure);
 };
 
-#endif // TABLEBUILDER_H
+#endif // SIMPLEXTABLEBUILDER_H

@@ -1,7 +1,10 @@
+#include <QMessageBox>
 #include "mainwindow.h"
+#include "Dialogs/TransportationDialog.h"
 #include "dualsimplexclass.h"
 #include "gomoryclass.h"
-#include "tablebuilder.h"
+#include "simplextablebuilder.h"
+#include "transportationtablebuilder.h"
 #include "ui_mainwindow.h"
 
 void clearLayout(QHBoxLayout*);
@@ -12,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->methodComboBox->addItems({"Simplex", "DualSimplex", "Gomory"});
+    ui->methodComboBox->addItems({"Simplex", "DualSimplex", "Gomory", "Transportation(Potentials)"});
 
     ui->coeffCountSpinBox->setMinimum(2);
 
@@ -58,6 +61,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
             QString tableStr = "CT-" + QString::number(nextIndex+1);
             ui->tableLabel->setText(tableStr);
+        }
+        else if (event->key() == Qt::Key_Enter) {
+            on_calculateButton_clicked();
         }
     }
 }
@@ -212,7 +218,7 @@ QLineEdit* MainWindow::ReadAllInputs()
 
 void MainWindow::on_calculateButton_clicked()
 {
-    tables.clear();
+    ClearUI();
 
     if(prevFalseLineEdit){
         prevFalseLineEdit->setStyleSheet("");
@@ -225,7 +231,7 @@ void MainWindow::on_calculateButton_clicked()
     }
 
     // Building logic
-    TableBuilder builder(lpMethod);
+    SimplexTableBuilder builder(lpMethod);
 
     int tableCounter = -1;
     do{
@@ -285,6 +291,15 @@ void MainWindow::Transpose(QVector<QVector<double>> &vectorToTranspose)
     }
 }
 
+void MainWindow::ClearUI()
+{
+    tables.clear();
+    while (ui->tablesStackedWidget->count() > 0) {
+        QWidget* widget = ui->tablesStackedWidget->widget(0);
+        ui->tablesStackedWidget->removeWidget(widget);
+    }
+}
+
 
 void MainWindow::on_coeffCountSpinBox_valueChanged(int arg)
 {
@@ -306,5 +321,18 @@ void clearLayout(QHBoxLayout* layout) {
 void MainWindow::on_methodComboBox_currentIndexChanged(int index)
 {
     currentMethod = static_cast<Method>(index);
+    if(currentMethod == PotentialsTransportation){
+        ClearUI();
+
+        TransportationDialog dialog;
+        dialog.exec();
+        int rows = dialog.getRows();
+        int cols = dialog.getCols();
+
+        QTableWidget* table = TransportationTableBuilder::CreateInitialTable(rows, cols);
+        tables.append(table);
+
+        ui->tablesStackedWidget->addWidget(table);
+    };
 }
 

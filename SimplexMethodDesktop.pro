@@ -15,15 +15,18 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     simplexclass.cpp \
-    tablebuilder.cpp
+    simplextablebuilder.cpp \
+    transportationtablebuilder.cpp
 
 HEADERS += \
+    Dialogs/TransportationDialog.h \
     dualsimplexclass.h \
     gomoryclass.h \
     lpmethods.h \
     mainwindow.h \
     simplexclass.h \
-    tablebuilder.h
+    simplextablebuilder.h \
+    transportationtablebuilder.h
 
 FORMS += \
     mainwindow.ui
