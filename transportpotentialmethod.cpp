@@ -8,7 +8,11 @@ TransportPotentialMethod::TransportPotentialMethod(QTableWidget *srcTable, QObje
 
 void TransportPotentialMethod::SolveOneStep()
 {
+    if(totalCost == 0)
+        NorthWestCorner();
 
+    CalculatePotentials();
+    CalculateFictitiousCells();
 }
 
 void TransportPotentialMethod::ReadTransportationTable(QTableWidget* srcTable)

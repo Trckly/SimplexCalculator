@@ -23,8 +23,9 @@ protected:
     double totalCost = 0;
 
 public:
+    void SolveOneStep();
+
     void ReadTransportationTable(QTableWidget *srcTable);
-    void NorthWestCorner();
 
     QVector<double> GetSupply();
     QVector<double> GetDemand();
@@ -33,12 +34,17 @@ public:
     double GetTotalCost();
 
 protected:
+    void NorthWestCorner();
+
     void CalculateTotalCost();
 
     void CalculatePotentials();
 
     void CalculateFictitiousCells();
 
+    void LoopPivoting();
+
+    bool IsOptimal(const QVector<double>& w);
 };
 
 #endif // TRANSPORTPOTENTIALMETHOD_H

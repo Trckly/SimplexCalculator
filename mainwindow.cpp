@@ -252,7 +252,7 @@ void MainWindow::on_calculateButton_clicked()
     }
     else if(currentMethod == PotentialsTransportation){
         if(auto transportationMethod = new TransportPotentialMethod(tables.first())){
-            transportationMethod->NorthWestCorner();
+            transportationMethod->SolveOneStep();
             QTableWidget* table = TransportationTableBuilder::ConstructTable(transportationMethod);
             tables.append(table);
         }
