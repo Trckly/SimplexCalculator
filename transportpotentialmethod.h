@@ -15,12 +15,17 @@ protected:
     QVector<double> demand;
 
     QVector<QVector<double>> pathMatrix;
-    QVector<QVector<double>> demandSupplyMatrix;
+    QVector<QVector<double>> supplyDemandMatrix;
 
 public:
     void ReadTransportationTable(QTableWidget *srcTable);
 
     void NorthWestCorner();
+
+    QVector<double> GetSupply();
+    QVector<double> GetDemand();
+    QVector<QVector<double>> GetPathMatrix();
+    QVector<QVector<double>> GetSupplyDemandMatrix();
 
 signals:
 };

@@ -219,10 +219,11 @@ QLineEdit* MainWindow::ReadAllInputs()
 
 void MainWindow::on_calculateButton_clicked()
 {
-    ClearUI();
+    // One table means initial input table for transportation problem
+    if(tables.count() > 1)
+        ClearUI();
 
     if(currentMethod != PotentialsTransportation) {
-
         if(prevFalseLineEdit){
             prevFalseLineEdit->setStyleSheet("");
         }
@@ -251,9 +252,10 @@ void MainWindow::on_calculateButton_clicked()
     }
     else if(currentMethod == PotentialsTransportation){
         if(auto transportationMethod = new TransportPotentialMethod(tables.first())){
-
+            transportationMethod->NorthWestCorner();
+            QTableWidget* table = TransportationTableBuilder::ConstructTable(transportationMethod);
+            tables.append(table);
         }
-
     }
 
     for(int i = 0; i < tables.count(); ++i){
@@ -341,7 +343,7 @@ void MainWindow::on_methodComboBox_currentIndexChanged(int index)
         int rows = dialog.getRows();
         int cols = dialog.getCols();
 
-        QTableWidget* table = TransportationTableBuilder::CreateInitialTable(rows, cols);
+        QTableWidget* table = TransportationTableBuilder::CreateInitialTable_TEST(rows, cols);
         tables.append(table);
 
         ui->tablesStackedWidget->addWidget(table);

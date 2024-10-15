@@ -35,16 +35,12 @@ void TransportPotentialMethod::NorthWestCorner()
 {
     int jFillOffset = -1;
 
-    QVector<double> tempSupply = supply;
-    QVector<double> tempDemand = demand;
-
-    QVector<double> demandSupplyRow;
-
     for (int i = 0; i < supply.count(); ++i){
+        QVector<double> demandSupplyRow;
         bool bFillRow = false;
 
         for (int j = 0 ; j < demand.count(); ++j){
-            double leftover = tempSupply[i] - tempDemand[j];
+            double leftover = supply[i] - demand[j];
 
             if(j == jFillOffset || bFillRow){
                 demandSupplyRow.append(0);
@@ -53,18 +49,39 @@ void TransportPotentialMethod::NorthWestCorner()
 
             if(leftover >= 0){
                 jFillOffset++;
-                demandSupplyRow.append(tempDemand[j]);
+                demandSupplyRow.append(demand[j]);
 
-                tempSupply[i] = leftover;
-                tempDemand[j] = 0;
+                supply[i] = leftover;
+                demand[j] = 0;
             }
             else {
                 bFillRow = true;
-                demandSupplyRow.append(tempSupply[i]);
+                demandSupplyRow.append(supply[i]);
 
-                tempSupply[i] = 0;
-                tempDemand[j] = -leftover;
+                supply[i] = 0;
+                demand[j] = -leftover;
             }
         }
+        supplyDemandMatrix.append(demandSupplyRow);
     }
+}
+
+QVector<QVector<double> > TransportPotentialMethod::GetPathMatrix()
+{
+    return pathMatrix;
+}
+
+QVector<QVector<double> > TransportPotentialMethod::GetSupplyDemandMatrix()
+{
+    return supplyDemandMatrix;
+}
+
+QVector<double> TransportPotentialMethod::GetSupply()
+{
+    return supply;
+}
+
+QVector<double> TransportPotentialMethod::GetDemand()
+{
+    return demand;
 }

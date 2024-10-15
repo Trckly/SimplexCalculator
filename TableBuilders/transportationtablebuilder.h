@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTableWidget>
+#include "transportpotentialmethod.h"
 
 class TransportationTableBuilder : public QObject
 {
@@ -11,6 +12,10 @@ public:
     explicit TransportationTableBuilder(QObject *parent = nullptr);
 
     static QTableWidget* CreateInitialTable(int rows, int columns);
+
+    static QTableWidget* CreateInitialTable_TEST(int rows, int columns);
+
+    static QTableWidget* ConstructTable(TransportPotentialMethod *trpMethod);
 };
 
 #endif // TRANSPORTATIONTABLEBUILDER_H
