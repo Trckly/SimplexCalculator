@@ -73,9 +73,10 @@ QTableWidget *TransportationTableBuilder::ConstructTable(TransportPotentialMetho
     auto demand = trpMethod->GetDemand();
     auto supplyDemandMatrix = trpMethod->GetSupplyDemandMatrix();
     auto pathMatrix = trpMethod->GetPathMatrix();
+    auto totalCost = trpMethod->GetTotalCost();
 
-    int rows = supplyDemandMatrix.count();
-    int cols = pathMatrix.count();
+    int rows = supply.count();
+    int cols = demand.count();
 
     QTableWidget* table = CreateInitialTable(rows, cols);
 
@@ -96,7 +97,7 @@ QTableWidget *TransportationTableBuilder::ConstructTable(TransportPotentialMetho
 
             // Redundant element fill
             else
-                table->setItem(i, j, new QTableWidgetItem("0"));
+                table->setItem(i, j, new QTableWidgetItem(QString::number(totalCost)));
         }
     }
     return table;

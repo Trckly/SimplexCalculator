@@ -17,17 +17,23 @@ protected:
     QVector<QVector<double>> pathMatrix;
     QVector<QVector<double>> supplyDemandMatrix;
 
+    double totalCost = 0;
+
 public:
     void ReadTransportationTable(QTableWidget *srcTable);
-
     void NorthWestCorner();
 
     QVector<double> GetSupply();
     QVector<double> GetDemand();
     QVector<QVector<double>> GetPathMatrix();
     QVector<QVector<double>> GetSupplyDemandMatrix();
+    double GetTotalCost();
 
-signals:
+protected:
+    void CalculateTotalCost();
+
+    void CalculatePotentials();
+
 };
 
 #endif // TRANSPORTPOTENTIALMETHOD_H

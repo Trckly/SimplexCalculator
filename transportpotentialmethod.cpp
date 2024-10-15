@@ -64,6 +64,8 @@ void TransportPotentialMethod::NorthWestCorner()
         }
         supplyDemandMatrix.append(demandSupplyRow);
     }
+
+    CalculateTotalCost();
 }
 
 QVector<QVector<double> > TransportPotentialMethod::GetPathMatrix()
@@ -74,6 +76,42 @@ QVector<QVector<double> > TransportPotentialMethod::GetPathMatrix()
 QVector<QVector<double> > TransportPotentialMethod::GetSupplyDemandMatrix()
 {
     return supplyDemandMatrix;
+}
+
+double TransportPotentialMethod::GetTotalCost()
+{
+    return totalCost;
+}
+
+void TransportPotentialMethod::CalculateTotalCost()
+{
+    totalCost = 0;
+    for (int i = 0; i < supplyDemandMatrix.count(); ++i)
+        for (int j = 0 ; j < supplyDemandMatrix[0].count(); ++j)
+            totalCost += supplyDemandMatrix[i][j] * pathMatrix[i][j];
+}
+
+void TransportPotentialMethod::CalculatePotentials()
+{
+    QVector<double> v;
+    QVector<double> u(1, 0.0);
+
+    for (int i = 0; i < supply.count(); ++i){
+        for (int j = 0 ; j < demand.count(); ++j){
+            if(supplyDemandMatrix[i][j] == 0) continue;
+
+            if(u.count() == i)
+                u.append(pathMatrix[i][j] - v[j]);
+
+            if(v.count() == j)
+                v.append(pathMatrix[i][j] - u[i]);
+        }
+    }
+}
+
+void TransportPotentialMethod::CalculateFictitiousCells()
+{
+
 }
 
 QVector<double> TransportPotentialMethod::GetSupply()
