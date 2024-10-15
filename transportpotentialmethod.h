@@ -17,6 +17,9 @@ protected:
     QVector<QVector<double>> pathMatrix;
     QVector<QVector<double>> supplyDemandMatrix;
 
+    QVector<double> v;
+    QVector<double> u;
+
     double totalCost = 0;
 
 public:
@@ -33,6 +36,8 @@ protected:
     void CalculateTotalCost();
 
     void CalculatePotentials();
+
+    void CalculateFictitiousCells();
 
 };
 

@@ -83,9 +83,15 @@ QTableWidget *TransportationTableBuilder::ConstructTable(TransportPotentialMetho
     for (int i = 0; i < table->rowCount(); ++i){
         for (int j = 0; j < table->columnCount(); ++j){
             //Main matrix fill
-            if(i < table->rowCount() - 1 && j < table->columnCount() - 1)
+            if(i < table->rowCount() - 1 && j < table->columnCount() - 1){
                 table->setItem(i, j, new QTableWidgetItem(QString::number(supplyDemandMatrix[i][j]) + "  (" +
                                                             QString::number(pathMatrix[i][j]) + ")"));
+
+                // Cell color fill
+                supplyDemandMatrix[i][j] != 0 ?
+                    table->item(i, j)->setBackground(QColor(255, 255, 150)) :
+                    table->item(i, j)->setBackground(QColor(255, 150, 150));
+            }
 
             // Supply fill
             else if(i < table->rowCount() - 1 && j == table->columnCount() - 1)
