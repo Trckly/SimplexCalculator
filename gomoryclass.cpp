@@ -4,10 +4,13 @@
 #include "gomoryclass.h"
 #include "simplexclass.h"
 #include "dualsimplexclass.h"
+#include <boost/multiprecision/cpp_dec_float.hpp>
 
-double GetFraction(double num);
+using namespace boost::multiprecision;
 
-GomoryClass::GomoryClass(const QVector<double> &objFuncCoeffVector, const QVector<QVector<double> > &constrCoeffMatrix, const QVector<int> &signs, const QVector<double> &plans, QObject *parent)
+cpp_dec_float_100 GetFraction(cpp_dec_float_100 num);
+
+GomoryClass::GomoryClass(const QVector<cpp_dec_float_100> &objFuncCoeffVector, const QVector<QVector<cpp_dec_float_100> > &constrCoeffMatrix, const QVector<int> &signs, const QVector<cpp_dec_float_100> &plans, QObject *parent)
     : LPMethod(objFuncCoeffVector, constrCoeffMatrix, signs, plans, parent)
 {
     InitializeClass();
@@ -100,7 +103,7 @@ bool GomoryClass::SolveSimplexOneStep()
 
 void GomoryClass::MakeConstraint()
 {
-    double max = std::numeric_limits<double>::min();
+    cpp_dec_float_100 max = std::numeric_limits<cpp_dec_float_100>::max();
     for (int i = 0; i < structure.plans.count(); ++i){
         if(i == 0){
             max = GetFraction(structure.plans[i]);
@@ -160,6 +163,9 @@ void GomoryClass::CorrectBaseIndexes()
     structure.baseIndexes.append(structure.constrCoeffMatrix[0].count() - 2);
 }
 
-double GetFraction(double num){
+cpp_dec_float_100 GetFraction(cpp_dec_float_100 num){
+    if(num < 0.0)
+        return 1 + (num - (int)num);
+
     return num - (int)num;
 }

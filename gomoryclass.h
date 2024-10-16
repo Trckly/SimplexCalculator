@@ -2,13 +2,16 @@
 
 #include <QObject>
 #include "lpmethods.h"
+#include <boost/multiprecision/cpp_dec_float.hpp>
+
+using namespace boost::multiprecision;
 
 class GomoryClass : public LPMethod
 {
     Q_OBJECT
 public:
-    explicit GomoryClass(const QVector<double>& objFuncCoeffVector, const QVector<QVector<double>>& constrCoeffMatrix,
-                         const QVector<int>& signs, const QVector<double>& plans, QObject *parent = nullptr);
+    explicit GomoryClass(const QVector<cpp_dec_float_100>& objFuncCoeffVector, const QVector<QVector<cpp_dec_float_100>>& constrCoeffMatrix,
+                         const QVector<int>& signs, const QVector<cpp_dec_float_100>& plans, QObject *parent = nullptr);
 
 private:
     LPMethod* activeLpMethod;
@@ -19,8 +22,8 @@ private:
     void InitializeClass();
 
 protected:
-    double plansFraction;
-    QVector<double> fractions;
+    cpp_dec_float_100 plansFraction;
+    QVector<cpp_dec_float_100> fractions;
     int rowIndex;
 
 public:

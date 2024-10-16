@@ -7,8 +7,8 @@ class DualSimplexClass : public LPMethod
 {
     Q_OBJECT
 public:
-    explicit DualSimplexClass(const QVector<double>& objFuncCoeffVector, const QVector<QVector<double>>& constrCoeffMatrix,
-                              const QVector<int>& signs, const QVector<double>& plans, QObject *parent = nullptr);
+    explicit DualSimplexClass(const QVector<cpp_dec_float_100>& objFuncCoeffVector, const QVector<QVector<cpp_dec_float_100>>& constrCoeffMatrix,
+                              const QVector<int>& signs, const QVector<cpp_dec_float_100>& plans, QObject *parent = nullptr);
     DualSimplexClass(const LpStructure& otherStructure);
     DualSimplexClass();
 

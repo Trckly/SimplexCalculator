@@ -4,6 +4,9 @@
 #include <QObject>
 #include <QTableWidget>
 #include "transportpotentialmethod.h"
+#include <boost/multiprecision/cpp_dec_float.hpp>
+
+using namespace boost::multiprecision;
 
 class TransportationTableBuilder : public QObject
 {

@@ -1,7 +1,7 @@
 #include "dualsimplexclass.h"
 
-DualSimplexClass::DualSimplexClass(const QVector<double> &objFuncCoeffVector, const QVector<QVector<double> > &constrCoeffMatrix,
-                                   const QVector<int> &signs, const QVector<double> &plans, QObject *parent)
+DualSimplexClass::DualSimplexClass(const QVector<cpp_dec_float_100> &objFuncCoeffVector, const QVector<QVector<cpp_dec_float_100> > &constrCoeffMatrix,
+                                   const QVector<int> &signs, const QVector<cpp_dec_float_100> &plans, QObject *parent)
     : LPMethod(objFuncCoeffVector, constrCoeffMatrix, signs, plans, parent)
 {
     InitializeClass();
@@ -30,12 +30,12 @@ void DualSimplexClass::InitializeClass()
 
 int DualSimplexClass::GetMinColumnIndex(int rowIndex)
 {
-    double min = std::numeric_limits<double>::max(), tempRatio;
+    cpp_dec_float_100 min = std::numeric_limits<cpp_dec_float_100>::max(), tempRatio;
     int minIndex = 0;
     for (int i = 0; i < structure.constrCoeffMatrix[0].count(); ++i){
         tempRatio = -1;
         if(structure.constrCoeffMatrix[rowIndex][i] < 0){
-            tempRatio = structure.lastRow[i] / structure.constrCoeffMatrix[rowIndex][i];
+            tempRatio = boost::multiprecision::abs(structure.lastRow[i] / structure.constrCoeffMatrix[rowIndex][i]);
             if(tempRatio < min){
                 min = tempRatio;
                 minIndex = i;
@@ -48,7 +48,7 @@ int DualSimplexClass::GetMinColumnIndex(int rowIndex)
 
 int DualSimplexClass::GetMinRowIndex()
 {
-    double min = std::numeric_limits<double>::max();
+    cpp_dec_float_100 min = std::numeric_limits<cpp_dec_float_100>::max();
     int minIndex = 0;
     for (int i = 0; i < structure.plans.count(); ++i){
         if(i == 0){
@@ -65,11 +65,11 @@ int DualSimplexClass::GetMinRowIndex()
 
 void DualSimplexClass::TransposeConstrCoefficients()
 {
-    const QVector<QVector<double>> temp = structure.constrCoeffMatrix;
+    const QVector<QVector<cpp_dec_float_100>> temp = structure.constrCoeffMatrix;
     structure.constrCoeffMatrix.clear();
 
     for(int i = 0; i < temp[0].count(); ++i){
-        QVector<double> row;
+        QVector<cpp_dec_float_100> row;
         for (int j = 0; j < temp.count(); ++j){
             row.append(temp[j][i]);
         }
@@ -79,8 +79,8 @@ void DualSimplexClass::TransposeConstrCoefficients()
 
 void DualSimplexClass::SwapObjFuncWithPlans()
 {
-    QVector<double> newPlans = structure.objFuncCoeffVector;
-    QVector<double> newObjFuncCoeff = structure.plans;
+    QVector<cpp_dec_float_100> newPlans = structure.objFuncCoeffVector;
+    QVector<cpp_dec_float_100> newObjFuncCoeff = structure.plans;
 
     structure.objFuncCoeffVector.clear();
     structure.plans.clear();
@@ -91,7 +91,7 @@ void DualSimplexClass::SwapObjFuncWithPlans()
 
 void DualSimplexClass::BringToCanonical()
 {
-    for (double& plan : structure.plans){
+    for (cpp_dec_float_100& plan : structure.plans){
         plan *= -1;
     }
 

@@ -3,6 +3,9 @@
 
 #include <QObject>
 #include<QTableWidget>
+#include <boost/multiprecision/cpp_dec_float.hpp>
+
+using namespace boost::multiprecision;
 
 class TransportPotentialMethod : public QObject
 {
@@ -11,27 +14,27 @@ public:
     explicit TransportPotentialMethod(QTableWidget* srcTable, QObject *parent = nullptr);
 
 protected:
-    QVector<double> supply;
-    QVector<double> demand;
+    QVector<cpp_dec_float_100> supply;
+    QVector<cpp_dec_float_100> demand;
 
-    QVector<QVector<double>> pathMatrix;
-    QVector<QVector<double>> supplyDemandMatrix;
+    QVector<QVector<cpp_dec_float_100>> pathMatrix;
+    QVector<QVector<cpp_dec_float_100>> supplyDemandMatrix;
 
-    QVector<double> v;
-    QVector<double> u;
+    QVector<cpp_dec_float_100> v;
+    QVector<cpp_dec_float_100> u;
 
-    double totalCost = 0;
+    cpp_dec_float_100 totalCost = 0;
 
 public:
     void SolveOneStep();
 
     void ReadTransportationTable(QTableWidget *srcTable);
 
-    QVector<double> GetSupply();
-    QVector<double> GetDemand();
-    QVector<QVector<double>> GetPathMatrix();
-    QVector<QVector<double>> GetSupplyDemandMatrix();
-    double GetTotalCost();
+    QVector<cpp_dec_float_100> GetSupply();
+    QVector<cpp_dec_float_100> GetDemand();
+    QVector<QVector<cpp_dec_float_100>> GetPathMatrix();
+    QVector<QVector<cpp_dec_float_100>> GetSupplyDemandMatrix();
+    cpp_dec_float_100 GetTotalCost();
 
 protected:
     void NorthWestCorner();
@@ -44,7 +47,7 @@ protected:
 
     void LoopPivoting();
 
-    bool IsOptimal(const QVector<double>& w);
+    bool IsOptimal(const QVector<cpp_dec_float_100>& w);
 };
 
 #endif // TRANSPORTPOTENTIALMETHOD_H

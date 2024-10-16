@@ -21,9 +21,9 @@ void TransportPotentialMethod::ReadTransportationTable(QTableWidget* srcTable)
     int cols = srcTable->columnCount();
 
     for (int i = 0; i < rows; ++i){
-        QVector<double> pathRow;
+        QVector<cpp_dec_float_100> pathRow;
         for (int j = 0; j < cols; ++j){
-            double currentValue = srcTable->item(i, j)->text().toDouble();
+            cpp_dec_float_100 currentValue = srcTable->item(i, j)->text().toDouble();
 
             if(i < rows - 1){
                 if (j == cols - 1)
@@ -45,11 +45,11 @@ void TransportPotentialMethod::NorthWestCorner()
     int jFillOffset = -1;
 
     for (int i = 0; i < supply.count(); ++i){
-        QVector<double> demandSupplyRow;
+        QVector<cpp_dec_float_100> demandSupplyRow;
         bool bFillRow = false;
 
         for (int j = 0 ; j < demand.count(); ++j){
-            double leftover = supply[i] - demand[j];
+            cpp_dec_float_100 leftover = supply[i] - demand[j];
 
             if(j == jFillOffset || bFillRow){
                 demandSupplyRow.append(0);
@@ -96,7 +96,7 @@ void TransportPotentialMethod::CalculatePotentials()
 
 void TransportPotentialMethod::CalculateFictitiousCells()
 {
-    QVector<double> w;
+    QVector<cpp_dec_float_100> w;
     QVector<int> iIndexes;
     QVector<int> yIndexes;
 
@@ -116,7 +116,7 @@ void TransportPotentialMethod::LoopPivoting()
 
 }
 
-bool TransportPotentialMethod::IsOptimal(const QVector<double>& w)
+bool TransportPotentialMethod::IsOptimal(const QVector<cpp_dec_float_100>& w)
 {
     for (int i = 0; i < w.count(); ++i){
         if(w[i] > 0)
@@ -134,27 +134,27 @@ void TransportPotentialMethod::CalculateTotalCost()
             totalCost += supplyDemandMatrix[i][j] * pathMatrix[i][j];
 }
 
-QVector<QVector<double> > TransportPotentialMethod::GetPathMatrix()
+QVector<QVector<cpp_dec_float_100> > TransportPotentialMethod::GetPathMatrix()
 {
     return pathMatrix;
 }
 
-QVector<QVector<double> > TransportPotentialMethod::GetSupplyDemandMatrix()
+QVector<QVector<cpp_dec_float_100> > TransportPotentialMethod::GetSupplyDemandMatrix()
 {
     return supplyDemandMatrix;
 }
 
-double TransportPotentialMethod::GetTotalCost()
+cpp_dec_float_100 TransportPotentialMethod::GetTotalCost()
 {
     return totalCost;
 }
 
-QVector<double> TransportPotentialMethod::GetSupply()
+QVector<cpp_dec_float_100> TransportPotentialMethod::GetSupply()
 {
     return supply;
 }
 
-QVector<double> TransportPotentialMethod::GetDemand()
+QVector<cpp_dec_float_100> TransportPotentialMethod::GetDemand()
 {
     return demand;
 }

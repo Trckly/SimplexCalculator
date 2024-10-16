@@ -155,31 +155,31 @@ QVector<int> MainWindow::ConvertSigns()
 // Returns first found invalid input line edit
 QLineEdit* MainWindow::ReadAllInputs()
 {
-    QVector<double> objFuncCoefficients;
+    QVector<cpp_dec_float_100> objFuncCoefficients;
     for (int i = 0; i < objFuncLineEditList.count(); ++i){
         if(objFuncLineEditList[i]->text().isEmpty()){
             objFuncLineEditList[i]->setText("0");
         }
 
         bool ok;
-        double temp = objFuncLineEditList[i]->text().toFloat(&ok);
+        cpp_dec_float_100 temp = objFuncLineEditList[i]->text().toFloat(&ok);
         if(!ok){
             return objFuncLineEditList[i];
         }
         objFuncCoefficients.append(temp);
     }
 
-    QVector<QVector<double>> constraintsCoefficients;
-    QVector<double> plans;
+    QVector<QVector<cpp_dec_float_100>> constraintsCoefficients;
+    QVector<cpp_dec_float_100> plans;
     for(int i = 0; i < constraintsLineEditMatrix.count(); ++i){
-        QVector<double> row;
+        QVector<cpp_dec_float_100> row;
 
         if(planLineEditVect[i]->text().isEmpty()){
             planLineEditVect[i]->setText("0");
         }
 
         bool k;
-        double t = planLineEditVect[i]->text().toFloat(&k);
+        cpp_dec_float_100 t = planLineEditVect[i]->text().toFloat(&k);
         if(!k){
             return planLineEditVect[i];
         }
@@ -191,7 +191,7 @@ QLineEdit* MainWindow::ReadAllInputs()
             }
 
             bool ok;
-            double temp = constraintsLineEditMatrix[i][j]->text().toFloat(&ok);
+            cpp_dec_float_100 temp = constraintsLineEditMatrix[i][j]->text().toFloat(&ok);
             if(!ok){
                 return constraintsLineEditMatrix[i][j];
             }
@@ -288,13 +288,13 @@ void MainWindow::on_nextTable_clicked()
     ui->tableLabel->setText(tableStr);
 }
 
-void MainWindow::Transpose(QVector<QVector<double>> &vectorToTranspose)
+void MainWindow::Transpose(QVector<QVector<cpp_dec_float_100>> &vectorToTranspose)
 {
-    const QVector<QVector<double>> temp = vectorToTranspose;
+    const QVector<QVector<cpp_dec_float_100>> temp = vectorToTranspose;
     vectorToTranspose.clear();
 
     for (int i = 0; i < temp[0].count(); ++i){
-        QVector<double> row;
+        QVector<cpp_dec_float_100> row;
         for (int j = 0; j < temp.count(); ++j){
             row.append(temp[j][i]);
         }

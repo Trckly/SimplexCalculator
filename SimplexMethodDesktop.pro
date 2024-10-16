@@ -33,6 +33,11 @@ HEADERS += \
 FORMS += \
     mainwindow.ui
 
+INCLUDEPATH += /opt/homebrew/Cellar/boost/1.86.0_1/include
+
+LIBS += -L/opt/homebrew/Cellar/boost/1.86.0_1/lib -lboost_system -lboost_filesystem
+
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

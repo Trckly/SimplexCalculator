@@ -45,12 +45,12 @@ QTableWidget* SimplexTableBuilder::ConstructTable()
             baseStr = "x" + QString::number(structure.baseIndexes[i]);
             c_bStr = QString::number(structure.baseIndexes[i] > structure.objFuncCoeffVector.count()
                                          ? 0
-                                         : structure.objFuncCoeffVector[structure.baseIndexes[i] - 1]);
-            planStr = QString::number(structure.plans[i]);
+                                         : (double)structure.objFuncCoeffVector[structure.baseIndexes[i] - 1]);
+            planStr = QString::number((double)structure.plans[i]);
 
             for (int j = 0; j < tableWidth - initHeaders.count(); ++j){
                 QString conCoeffStr;
-                    conCoeffStr = QString::number(structure.constrCoeffMatrix[i][j]);
+                    conCoeffStr = QString::number((double)structure.constrCoeffMatrix[i][j]);
                 table->setItem(i, j + 3, new QTableWidgetItem(conCoeffStr));
             }
         }
@@ -58,11 +58,11 @@ QTableWidget* SimplexTableBuilder::ConstructTable()
         else{
             baseStr = "Q";
             c_bStr = "=";
-            planStr = QString::number(structure.resultValue);
+            planStr = QString::number((double)structure.resultValue);
 
 
             for (int j = 0; j < structure.lastRow.count(); ++j){
-                QString lastRowCoeffStr = QString::number(structure.lastRow[j]);
+                QString lastRowCoeffStr = QString::number((double)structure.lastRow[j]);
                 table->setItem(i, j+3, new QTableWidgetItem(lastRowCoeffStr));
             }
         }
@@ -113,7 +113,7 @@ void SimplexTableBuilder::AppendRatio(QTableWidget* table, const LpStructure& st
 
         int j = table->columnCount() - 1;
         for (int i = 0; i < structure.ratio.count(); ++i){
-            table->setItem(i, j, new QTableWidgetItem(QString::number(structure.ratio[i])));
+            table->setItem(i, j, new QTableWidgetItem(QString::number((double)structure.ratio[i])));
         }
     }
 
@@ -125,7 +125,7 @@ void SimplexTableBuilder::AppendRatio(QTableWidget* table, const LpStructure& st
         int offset = initHeaders.count();
         QString ratioStr;
         for (int i = 0; i < structure.ratio.count(); ++i){
-            ratioStr = structure.ratio[i] < 0 ? "-" : QString::number(structure.ratio[i]);
+            ratioStr = structure.ratio[i] < 0 ? "-" : QString::number((double)structure.ratio[i]);
 
             table->setItem(newRowCount - 1, i + offset, new QTableWidgetItem());
 

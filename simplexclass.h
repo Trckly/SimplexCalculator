@@ -4,12 +4,13 @@
 #include <QObject>
 #include "lpmethods.h"
 
+
 class SimplexClass : public LPMethod
 {
     Q_OBJECT
 public:
-    explicit SimplexClass(const QVector<double>& objFuncCoeffVector, const QVector<QVector<double>>& constrCoeffMatrix,
-                             const QVector<int>& signs, const QVector<double>& plans, QObject *parent = nullptr);
+    explicit SimplexClass(const QVector<cpp_dec_float_100>& objFuncCoeffVector, const QVector<QVector<cpp_dec_float_100>>& constrCoeffMatrix,
+                             const QVector<int>& signs, const QVector<cpp_dec_float_100>& plans, QObject *parent = nullptr);
     SimplexClass(const LpStructure& otherStructure);
     SimplexClass();
 

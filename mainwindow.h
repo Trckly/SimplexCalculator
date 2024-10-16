@@ -47,7 +47,7 @@ protected:
 
     QVector<int> ConvertSigns();
 
-    static void Transpose(QVector<QVector<double>> &vectorToTranspose);
+    static void Transpose(QVector<QVector<cpp_dec_float_100>> &vectorToTranspose);
 
     // General
     void ClearUI();

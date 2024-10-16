@@ -52,7 +52,7 @@ QTableWidget *TransportationTableBuilder::CreateInitialTable_TEST(int rows, int 
     table->setVerticalHeaderLabels(verticalHeaderLabels);
     table->setHorizontalHeaderLabels(horizontalHeaderLabels);
 
-    QVector<QVector<double>> tableContents = {{2, 8, 4, 6, 3, 95},
+    QVector<QVector<cpp_dec_float_100>> tableContents = {{2, 8, 4, 6, 3, 95},
                                               {3, 2, 5, 2, 6, 55},
                                               {6, 5, 8, 7, 4, 40},
                                               {3, 4, 4, 2, 1, 60},
@@ -60,7 +60,7 @@ QTableWidget *TransportationTableBuilder::CreateInitialTable_TEST(int rows, int 
 
     for (int i = 0; i < table->rowCount(); ++i){
         for (int j = 0; j < table->columnCount(); ++j){
-            table->setItem(i, j, new QTableWidgetItem(QString::number(tableContents[i][j])));
+            table->setItem(i, j, new QTableWidgetItem(QString::number((double)tableContents[i][j])));
         }
     }
 
@@ -84,8 +84,8 @@ QTableWidget *TransportationTableBuilder::ConstructTable(TransportPotentialMetho
         for (int j = 0; j < table->columnCount(); ++j){
             //Main matrix fill
             if(i < table->rowCount() - 1 && j < table->columnCount() - 1){
-                table->setItem(i, j, new QTableWidgetItem(QString::number(supplyDemandMatrix[i][j]) + "  (" +
-                                                            QString::number(pathMatrix[i][j]) + ")"));
+                table->setItem(i, j, new QTableWidgetItem(QString::number((double)supplyDemandMatrix[i][j]) + "  (" +
+                                                            QString::number((double)pathMatrix[i][j]) + ")"));
 
                 // Cell color fill
                 supplyDemandMatrix[i][j] != 0 ?
@@ -95,15 +95,15 @@ QTableWidget *TransportationTableBuilder::ConstructTable(TransportPotentialMetho
 
             // Supply fill
             else if(i < table->rowCount() - 1 && j == table->columnCount() - 1)
-                table->setItem(i, j, new QTableWidgetItem(QString::number(supply[i])));
+                table->setItem(i, j, new QTableWidgetItem(QString::number((double)supply[i])));
 
             // Demand fill
             else if(i == table->rowCount() - 1 && j < table->columnCount() - 1)
-                table->setItem(i, j, new QTableWidgetItem(QString::number(demand[j])));
+                table->setItem(i, j, new QTableWidgetItem(QString::number((double)demand[j])));
 
             // Redundant element fill
             else
-                table->setItem(i, j, new QTableWidgetItem(QString::number(totalCost)));
+                table->setItem(i, j, new QTableWidgetItem(QString::number((double)totalCost)));
         }
     }
     return table;

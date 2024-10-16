@@ -4,6 +4,9 @@
 #include <QObject>
 #include <QTableWidget>
 #include "lpmethods.h"
+#include <boost/multiprecision/cpp_dec_float.hpp>
+
+using namespace boost::multiprecision;
 
 class SimplexTableBuilder : public QObject
 {
