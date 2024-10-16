@@ -244,7 +244,7 @@ void MainWindow::on_calculateButton_clicked()
                 builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
             tableCounter++;
         }
-        while (!lpMethod->SolveOneStep());
+        while (!lpMethod->SolveOneStep() && tableCounter <= 10);
 
         // Last table with solution
         tables.append(builder.ConstructTable());

@@ -28,6 +28,7 @@ QTableWidget* SimplexTableBuilder::ConstructTable()
     }
 
     table->setHorizontalHeaderLabels(currentHeaders);
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     QStringList rowHeaders;
     for (int i = 0; i < table->rowCount(); ++i){

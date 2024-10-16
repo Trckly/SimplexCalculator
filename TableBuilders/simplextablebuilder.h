@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTableWidget>
+#include <QHeaderView>
 #include "lpmethods.h"
 #include <boost/multiprecision/cpp_dec_float.hpp>
 

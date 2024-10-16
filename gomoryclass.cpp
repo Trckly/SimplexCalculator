@@ -70,9 +70,21 @@ LPMethod *GomoryClass::GetCurrentMethod()
 
 bool GomoryClass::IsSolved()
 {
+    qDebug() << "\nGomory IsSolved plans values:";
+
     bool bSolved = true;
-    for(int i = 0; i < structure.plans.count(); ++i)
-        bSolved = structure.plans[i] - (int)structure.plans[i] != 0 ? false : true;
+
+    cpp_dec_float_100 epsilon = 1e-9;  // Small tolerance for floating-point comparison
+
+    for(int i = 0; i < structure.plans.count(); ++i){
+        cpp_dec_float_100 result = structure.plans[i] - floor(structure.plans[i]);
+
+        // Check if result is close to 0 or 1 (i.e., it's nearly an integer)
+        if (!(boost::multiprecision::abs(result) < epsilon ||
+              boost::multiprecision::abs(result - 1.0) < epsilon)) {
+            bSolved = false;
+        }
+    }
 
     if(structure.leadElement == 0){
         bSolved = true;
