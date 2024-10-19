@@ -33,9 +33,15 @@ HEADERS += \
 FORMS += \
     mainwindow.ui
 
-INCLUDEPATH += /opt/homebrew/Cellar/boost/1.86.0_1/include
+# My MacOS boost library inclusion directory
+# INCLUDEPATH += /opt/homebrew/Cellar/boost/1.86.0_1/include
+# LIBS += -L/opt/homebrew/Cellar/boost/1.86.0_1/lib -lboost_system -lboost_filesystem
 
-LIBS += -L/opt/homebrew/Cellar/boost/1.86.0_1/lib -lboost_system -lboost_filesystem
+# My Windows boost library inclusion directory
+INCLUDEPATH += C:/boost_1_86_0
+LIBS += -LC:/boost_1_86_0/bin/x64/lib
+
+
 
 
 # Default rules for deployment.
