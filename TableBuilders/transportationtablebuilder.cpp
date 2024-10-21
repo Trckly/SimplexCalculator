@@ -89,8 +89,8 @@ QTableWidget *TransportationTableBuilder::ConstructTable(TransportPotentialMetho
 
                 // Cell color fill
                 supplyDemandMatrix[i][j] != 0 ?
-                    table->item(i, j)->setBackground(QColor(255, 255, 150)) :
-                    table->item(i, j)->setBackground(QColor(255, 150, 150));
+                    table->item(i, j)->setBackground(QColor(150, 150, 0)) :
+                    table->item(i, j)->setBackground(QColor(100, 0, 0));
             }
 
             // Supply fill

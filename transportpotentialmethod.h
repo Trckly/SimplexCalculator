@@ -67,7 +67,11 @@ protected:
 
     bool IsOptimal();
 
-    Cell LookInDirection(const Cell &nonBasicCell, LookDirection direction);
+    Cell LookInDirection(const Cell &nonBasicCell, int direction, const Cell initialCell = Cell{-1, -1, -1});
+
+    bool IsSameCell(const Cell& firstCell, const Cell& otherCell);
+
+    cpp_dec_float_100 FindPivotValue(const QVector<Cell>& searchVector);
 };
 
 #endif // TRANSPORTPOTENTIALMETHOD_H

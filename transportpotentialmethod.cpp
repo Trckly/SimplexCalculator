@@ -9,16 +9,16 @@ TransportPotentialMethod::TransportPotentialMethod(QTableWidget *srcTable, QObje
 
 bool TransportPotentialMethod::SolveOneStep()
 {
-    if(totalCost == 0)
+    if(totalCost == 0){
         NorthWestCorner();
+        return false;
+    }
 
     CalculatePotentials();
     CalculateFictitiousCells();
     if(IsOptimal())
         return true;
-
-
-
+    LoopPivoting();
 
     return false;
 }
@@ -87,6 +87,9 @@ void TransportPotentialMethod::NorthWestCorner()
 
 void TransportPotentialMethod::CalculatePotentials()
 {
+    u.clear();
+    v.clear();
+
     u.resize(1, 0.0);
 
     for (int i = 0; i < supply.count(); ++i){
@@ -122,17 +125,56 @@ void TransportPotentialMethod::LoopPivoting()
         return a.value < b.value;
     });
 
-    Cell nonBasicCell = w.first();
+    Cell nonBasicCell = w.last();
 
-    for (int i = 0; i < pathMatrix.count(); ++i){
-        for (int j = 0; j < pathMatrix.first().count(); ++j){
+    qDebug() << "Value: " <<(double)nonBasicCell.value << ";\ti: " << nonBasicCell.i << ";\tj: " << nonBasicCell.j;
 
+    int dir = 0;
+    int hit = 0;
+    Cell result = nonBasicCell;
+    QVector<Cell> markedCells{nonBasicCell};
+    // Trace loop
+    do{
+        result = hit != 3 ? LookInDirection(result, dir) : LookInDirection(result, dir, nonBasicCell);
+
+        if(result.i != -1){
+            hit++;
+            markedCells.append(result);
+
+            if(hit == 4 && !IsSameCell(result, nonBasicCell)){
+                dir < 2 ? dir += 2 : dir -= 2;
+                markedCells.removeLast();
+
+                qDebug() << "Value: " <<(double)result.value << ";\ti: " << result.i << ";\tj: " << result.j;
+                qDebug() << "Direction: " << dir << ";\tHits: " << hit;
+
+                continue;
+            }
         }
+
+        qDebug() << "Value: " <<(double)result.value << ";\ti: " << result.i << ";\tj: " << result.j;
+        qDebug() << "Direction: " << dir << ";\tHits: " << hit << "\n";
+
+        dir = dir == 3 ? 0 : dir + 1;
+    } while (!IsSameCell(result, nonBasicCell));
+
+    // Replace values
+    cpp_dec_float_100 pivotValue = FindPivotValue(markedCells);
+    for (int i = 0; i < markedCells.count(); ++i){
+        if (i % 2 == 0){
+            supplyDemandMatrix[markedCells[i].i][markedCells[i].j] += pivotValue;
+        }
+        else
+            supplyDemandMatrix[markedCells[i].i][markedCells[i].j] -= pivotValue;
     }
 }
 
 bool TransportPotentialMethod::IsOptimal()
 {
+    for (int i = 0; i < w.count(); ++i){
+        qDebug() << "Value: " <<(double)w[i].value << ";\ti: " << w[i].i << ";\tj: " << w[i].j;
+    }
+
     for (int i = 0; i < w.count(); ++i){
         if(w[i].value > 0)
             return false;
@@ -141,40 +183,88 @@ bool TransportPotentialMethod::IsOptimal()
     return true;
 }
 
-Cell TransportPotentialMethod::LookInDirection(const Cell& currentCell, LookDirection direction)
+Cell TransportPotentialMethod::LookInDirection(const Cell& currentCell, int direction, const Cell initialCell)
 {
     int rowCount = supplyDemandMatrix.count();
     int colCount = supplyDemandMatrix.first().count();
 
+    QVector<Cell> cells;
     if(direction == Left){
         for (int i = currentCell.j - 1; i >= 0; --i){
             auto value = supplyDemandMatrix[currentCell.i][i];
             if(value != 0)
-                return Cell{value, currentCell.i, i};
+                cells.append(Cell{value, currentCell.i, i});
+
+            if(initialCell.i == currentCell.i && initialCell.j == i)
+                cells.append(initialCell);
+        }
+
+        if(cells.count() > 0){
+            return cells.first();
         }
     }
     if(direction == Down){
         for (int i = currentCell.i + 1; i < rowCount; ++i){
             auto value = supplyDemandMatrix[i][currentCell.j];
             if(value != 0)
-                return Cell{value, currentCell.i, i};
+                cells.append(Cell{value, i, currentCell.j});
+
+            if(initialCell.i == i && initialCell.j == currentCell.j)
+                cells.append(initialCell);
+        }
+
+        if(cells.count() > 0){
+            return cells.first();
         }
     }
     if(direction == Right){
         for (int i = currentCell.j + 1; i < colCount; ++i){
             auto value = supplyDemandMatrix[currentCell.i][i];
             if(value != 0)
-                return Cell{value, currentCell.i, i};
+                cells.append(Cell{value, currentCell.i, i});
+
+            if(initialCell.i == currentCell.i && initialCell.j == i)
+                cells.append(initialCell);
+        }
+
+        if(cells.count() > 0){
+            return cells.first();
         }
     }
     if(direction == Up){
         for (int i = currentCell.i - 1; i >= 0; --i){
             auto value = supplyDemandMatrix[i][currentCell.j];
             if(value != 0)
-                return Cell{value, currentCell.i, i};
+                cells.append(Cell{value, i, currentCell.j});
+
+            if(initialCell.i == i && initialCell.j == currentCell.j)
+                cells.append(initialCell);
+        }
+
+        if(cells.count() > 0){
+            return cells.first();
         }
     }
     return Cell{-1, -1, -1};
+}
+
+bool TransportPotentialMethod::IsSameCell(const Cell &firstCell, const Cell &otherCell)
+{
+    return firstCell.i == otherCell.i && firstCell.j == otherCell.j && firstCell.value == otherCell.value;
+}
+
+cpp_dec_float_100 TransportPotentialMethod::FindPivotValue(const QVector<Cell> &searchVector)
+{
+    cpp_dec_float_100 min = std::numeric_limits<cpp_dec_float_100>::max();
+    for (int i = 0; i < searchVector.count(); ++i){
+        if(i % 2 == 1 && min > searchVector[i].value){
+            min = searchVector[i].value;
+        }
+    }
+
+    qDebug() << "Pivot value is: " << (double)min;
+
+    return min;
 }
 
 void TransportPotentialMethod::CalculateTotalCost()
