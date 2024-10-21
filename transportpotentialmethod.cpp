@@ -90,18 +90,54 @@ void TransportPotentialMethod::CalculatePotentials()
     u.clear();
     v.clear();
 
-    u.resize(1, 0.0);
+    // Resize u and v to match the number of supply and demand respectively
+    u.resize(supply.count(), std::numeric_limits<cpp_dec_float_100>::infinity());
+    v.resize(demand.count(), std::numeric_limits<cpp_dec_float_100>::infinity());
 
-    for (int i = 0; i < supply.count(); ++i){
-        for (int j = 0 ; j < demand.count(); ++j){
-            if(supplyDemandMatrix[i][j] == 0) continue;
+    // Set the first potential to 0, typically as a starting point
+    u[0] = 0;
 
-            if(u.count() == i)
-                u.append(pathMatrix[i][j] - v[j]);
-
-            if(v.count() == j)
-                v.append(pathMatrix[i][j] - u[i]);
+    QString debugStr;
+    qDebug() << "Supply and demand matrix:";
+    for (int i = 0; i < supply.count(); ++i) {
+        debugStr = "";
+        for (int j = 0 ; j < demand.count(); ++j) {
+            debugStr += QString::number((double)supplyDemandMatrix[i][j]) + "  ";
         }
+        qDebug() << debugStr;
+    }
+
+    bool updated = true;
+    while (updated) {
+        updated = false;
+
+        for (int i = 0; i < supply.count(); ++i) {
+            for (int j = 0; j < demand.count(); ++j) {
+                if (supplyDemandMatrix[i][j] == 0) continue;
+
+                // If u[i] is known and v[j] is unknown, calculate v[j]
+                if (u[i] != std::numeric_limits<cpp_dec_float_100>::infinity() && v[j] == std::numeric_limits<cpp_dec_float_100>::infinity()) {
+                    v[j] = pathMatrix[i][j] - u[i];
+                    updated = true;
+                }
+
+                // If v[j] is known and u[i] is unknown, calculate u[i]
+                if (v[j] != std::numeric_limits<cpp_dec_float_100>::infinity() && u[i] == std::numeric_limits<cpp_dec_float_100>::infinity()) {
+                    u[i] = pathMatrix[i][j] - v[j];
+                    updated = true;
+                }
+            }
+        }
+    }
+
+    // Debugging potentials for clarity
+    qDebug() << "Potentials u:";
+    for (cpp_dec_float_100 potential : u) {
+        qDebug() << (double)potential;
+    }
+    qDebug() << "Potentials v:";
+    for (cpp_dec_float_100 potential : v) {
+        qDebug() << (double)potential;
     }
 }
 
@@ -125,7 +161,13 @@ void TransportPotentialMethod::LoopPivoting()
         return a.value < b.value;
     });
 
+    // Basically it takes first max element if there are more than 1
     Cell nonBasicCell = w.last();
+    cpp_dec_float_100 maxElement = w.last().value;
+    do{
+        nonBasicCell = w.last();
+        w.removeLast();
+    } while(w.last().value == maxElement);
 
     qDebug() << "Value: " <<(double)nonBasicCell.value << ";\ti: " << nonBasicCell.i << ";\tj: " << nonBasicCell.j;
 
@@ -135,6 +177,8 @@ void TransportPotentialMethod::LoopPivoting()
     QVector<Cell> markedCells{nonBasicCell};
     // Trace loop
     do{
+        if(result.i == -1)
+            result = nonBasicCell;
         result = hit != 3 ? LookInDirection(result, dir) : LookInDirection(result, dir, nonBasicCell);
 
         if(result.i != -1){
@@ -143,7 +187,10 @@ void TransportPotentialMethod::LoopPivoting()
 
             if(hit == 4 && !IsSameCell(result, nonBasicCell)){
                 dir < 2 ? dir += 2 : dir -= 2;
+                hit = 1;
+
                 markedCells.removeLast();
+                result = markedCells.last();
 
                 qDebug() << "Value: " <<(double)result.value << ";\ti: " << result.i << ";\tj: " << result.j;
                 qDebug() << "Direction: " << dir << ";\tHits: " << hit;
@@ -157,6 +204,10 @@ void TransportPotentialMethod::LoopPivoting()
 
         dir = dir == 3 ? 0 : dir + 1;
     } while (!IsSameCell(result, nonBasicCell));
+
+    // Last entry is the same as first
+    // Thus here it is being removed
+    markedCells.removeLast();
 
     // Replace values
     cpp_dec_float_100 pivotValue = FindPivotValue(markedCells);
@@ -188,6 +239,8 @@ Cell TransportPotentialMethod::LookInDirection(const Cell& currentCell, int dire
     int rowCount = supplyDemandMatrix.count();
     int colCount = supplyDemandMatrix.first().count();
 
+    qDebug() << "Value: " <<(double)currentCell.value << ";\ti: " << currentCell.i << ";\tj: " << currentCell.j << "\n";
+
     QVector<Cell> cells;
     if(direction == Left){
         for (int i = currentCell.j - 1; i >= 0; --i){
@@ -196,7 +249,7 @@ Cell TransportPotentialMethod::LookInDirection(const Cell& currentCell, int dire
                 cells.append(Cell{value, currentCell.i, i});
 
             if(initialCell.i == currentCell.i && initialCell.j == i)
-                cells.append(initialCell);
+                return initialCell;
         }
 
         if(cells.count() > 0){
@@ -209,8 +262,9 @@ Cell TransportPotentialMethod::LookInDirection(const Cell& currentCell, int dire
             if(value != 0)
                 cells.append(Cell{value, i, currentCell.j});
 
-            if(initialCell.i == i && initialCell.j == currentCell.j)
-                cells.append(initialCell);
+            if(initialCell.i == i && initialCell.j == currentCell.j){
+                return initialCell;
+            }
         }
 
         if(cells.count() > 0){
@@ -224,7 +278,7 @@ Cell TransportPotentialMethod::LookInDirection(const Cell& currentCell, int dire
                 cells.append(Cell{value, currentCell.i, i});
 
             if(initialCell.i == currentCell.i && initialCell.j == i)
-                cells.append(initialCell);
+                return initialCell;
         }
 
         if(cells.count() > 0){
@@ -238,7 +292,7 @@ Cell TransportPotentialMethod::LookInDirection(const Cell& currentCell, int dire
                 cells.append(Cell{value, i, currentCell.j});
 
             if(initialCell.i == i && initialCell.j == currentCell.j)
-                cells.append(initialCell);
+                return initialCell;
         }
 
         if(cells.count() > 0){

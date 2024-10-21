@@ -253,7 +253,7 @@ void MainWindow::on_calculateButton_clicked()
     else if(currentMethod == PotentialsTransportation){
         if(auto transportationMethod = new TransportPotentialMethod(tables.first())){
             bool bSolved = false;
-            for (int i = 0; i < 1 || !bSolved; ++i){
+            for (int i = 0; i < 4 || !bSolved; ++i){
                 bSolved = transportationMethod->SolveOneStep();
                 QTableWidget* table = TransportationTableBuilder::ConstructTable(transportationMethod);
                 tables.append(table);
