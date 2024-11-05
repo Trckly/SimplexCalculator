@@ -67,7 +67,7 @@ protected:
 
     bool IsOptimal();
 
-    Cell LookInDirection(const Cell &nonBasicCell, int direction, const Cell initialCell = Cell{-1, -1, -1});
+    Cell LookInDirection(const Cell &nonBasicCell, int direction, const Cell initialCell = Cell{-1, -1, -1}, bool recursion = false);
 
     bool IsSameCell(const Cell& firstCell, const Cell& otherCell);
 

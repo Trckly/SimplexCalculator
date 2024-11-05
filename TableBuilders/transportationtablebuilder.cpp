@@ -52,11 +52,17 @@ QTableWidget *TransportationTableBuilder::CreateInitialTable_TEST(int rows, int 
     table->setVerticalHeaderLabels(verticalHeaderLabels);
     table->setHorizontalHeaderLabels(horizontalHeaderLabels);
 
-    QVector<QVector<cpp_dec_float_100>> tableContents = {{2, 8, 4, 6, 3, 95},
-                                              {3, 2, 5, 2, 6, 55},
-                                              {6, 5, 8, 7, 4, 40},
-                                              {3, 4, 4, 2, 1, 60},
-                                              {30, 90, 80, 20, 30, 0}};
+    // QVector<QVector<cpp_dec_float_100>> tableContents = {{2, 8, 4, 6, 3, 95},
+    //                                           {3, 2, 5, 2, 6, 55},
+    //                                           {6, 5, 8, 7, 4, 40},
+    //                                           {3, 4, 4, 2, 1, 60},
+    //                                           {30, 90, 80, 20, 30, 0}};
+
+    QVector<QVector<cpp_dec_float_100>> tableContents = {{3, 7, 1, 5, 4, 30},
+                                                         {7, 5, 8, 6, 3, 5},
+                                                         {6, 4, 8, 3, 2, 45},
+                                                         {3, 1, 7, 4, 2, 40},
+                                                         {10, 35, 15, 25, 35, 0}};
 
     for (int i = 0; i < table->rowCount(); ++i){
         for (int j = 0; j < table->columnCount(); ++j){

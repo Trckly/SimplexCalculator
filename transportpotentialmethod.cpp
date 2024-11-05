@@ -19,6 +19,7 @@ bool TransportPotentialMethod::SolveOneStep()
     if(IsOptimal())
         return true;
     LoopPivoting();
+    CalculateTotalCost();
 
     return false;
 }
@@ -179,7 +180,7 @@ void TransportPotentialMethod::LoopPivoting()
     do{
         if(result.i == -1)
             result = nonBasicCell;
-        result = hit != 3 ? LookInDirection(result, dir) : LookInDirection(result, dir, nonBasicCell);
+        result = hit < 2 ? LookInDirection(result, dir) : LookInDirection(result, dir, nonBasicCell);
 
         if(result.i != -1){
             hit++;
@@ -234,12 +235,12 @@ bool TransportPotentialMethod::IsOptimal()
     return true;
 }
 
-Cell TransportPotentialMethod::LookInDirection(const Cell& currentCell, int direction, const Cell initialCell)
+Cell TransportPotentialMethod::LookInDirection(const Cell& currentCell, int direction, const Cell initialCell, bool recursion)
 {
     int rowCount = supplyDemandMatrix.count();
     int colCount = supplyDemandMatrix.first().count();
 
-    qDebug() << "Value: " <<(double)currentCell.value << ";\ti: " << currentCell.i << ";\tj: " << currentCell.j << "\n";
+    // qDebug() << "Value: " <<(double)currentCell.value << ";\ti: " << currentCell.i << ";\tj: " << currentCell.j << "\n";
 
     QVector<Cell> cells;
     if(direction == Left){
@@ -252,8 +253,16 @@ Cell TransportPotentialMethod::LookInDirection(const Cell& currentCell, int dire
                 return initialCell;
         }
 
-        if(cells.count() > 0){
-            return cells.first();
+        while(cells.count() > 0){
+            if(recursion)
+                return cells.last();
+
+            Cell temp = LookInDirection(cells.last(), direction + 1, initialCell, true);
+            // qDebug() << "Value: " <<(double)temp.value << ";\ti: " << temp.i << ";\tj: " << temp.j << "\n";
+            if(temp.i != -1){
+                return cells.last();
+            }
+            cells.removeLast();
         }
     }
     if(direction == Down){
@@ -267,8 +276,16 @@ Cell TransportPotentialMethod::LookInDirection(const Cell& currentCell, int dire
             }
         }
 
-        if(cells.count() > 0){
-            return cells.first();
+        while(cells.count() > 0){
+            if(recursion)
+                return cells.last();
+
+            Cell temp = LookInDirection(cells.last(), direction + 1, initialCell, true);
+            // qDebug() << "Value: " <<(double)temp.value << ";\ti: " << temp.i << ";\tj: " << temp.j << "\n";
+            if(temp.i != -1){
+                return cells.last();
+            }
+            cells.removeLast();
         }
     }
     if(direction == Right){
@@ -281,8 +298,16 @@ Cell TransportPotentialMethod::LookInDirection(const Cell& currentCell, int dire
                 return initialCell;
         }
 
-        if(cells.count() > 0){
-            return cells.first();
+        while(cells.count() > 0){
+            if(recursion)
+                return cells.last();
+
+            Cell temp = LookInDirection(cells.last(), direction + 1, initialCell, true);
+            // qDebug() << "Value: " <<(double)temp.value << ";\ti: " << temp.i << ";\tj: " << temp.j << "\n";
+            if(temp.i != -1){
+                return cells.last();
+            }
+            cells.removeLast();
         }
     }
     if(direction == Up){
@@ -295,8 +320,16 @@ Cell TransportPotentialMethod::LookInDirection(const Cell& currentCell, int dire
                 return initialCell;
         }
 
-        if(cells.count() > 0){
-            return cells.first();
+        while(cells.count() > 0){
+            if(recursion)
+                return cells.last();
+
+            Cell temp = LookInDirection(cells.last(), 0, initialCell, true);
+            qDebug() << "Value: " <<(double)temp.value << ";\ti: " << temp.i << ";\tj: " << temp.j << "\n";
+            if(temp.i != -1){
+                return cells.last();
+            }
+            cells.removeLast();
         }
     }
     return Cell{-1, -1, -1};
