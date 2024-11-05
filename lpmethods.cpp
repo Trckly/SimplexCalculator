@@ -1,7 +1,7 @@
 #include "lpmethods.h"
 
-LPMethod::LPMethod(const QVector<double>& objFuncCoeffVector, const QVector<QVector<double>>& constrCoeffMatrix,
-                     const QVector<int>& signs, const QVector<double>& plans, QObject *parent)
+LPMethod::LPMethod(const QVector<cpp_dec_float_100>& objFuncCoeffVector, const QVector<QVector<cpp_dec_float_100>>& constrCoeffMatrix,
+                     const QVector<int>& signs, const QVector<cpp_dec_float_100>& plans, QObject *parent)
     : QObject{parent}
 {
     structure.objFuncCoeffVector = objFuncCoeffVector;
@@ -96,7 +96,8 @@ void LPMethod::SetupLastRow()
 {
     int lastRowSize = structure.constrCoeffMatrix.count() + structure.objFuncCoeffVector.count();
     for(int i = 0; i < lastRowSize; ++i){
-        structure.lastRow.append(i < structure.objFuncCoeffVector.count() ? -structure.objFuncCoeffVector[i] : 0);
+        cpp_dec_float_100 zero = 0;
+        structure.lastRow.append(i < structure.objFuncCoeffVector.count() ? -structure.objFuncCoeffVector[i] : zero);
     }
 }
 
@@ -115,14 +116,14 @@ bool LPMethod::SquareRule()
         }
 
         if(i < structure.constrCoeffMatrix.count()){
-            double rowFactor = structure.constrCoeffMatrix[i][structure.leadColIndex];
+            cpp_dec_float_100 rowFactor = structure.constrCoeffMatrix[i][structure.leadColIndex];
             for (int j = 0; j < structure.constrCoeffMatrix[0].count(); ++j){
                 structure.constrCoeffMatrix[i][j] -= rowFactor * structure.constrCoeffMatrix[structure.leadRowIndex][j];
             }
             structure.plans[i] -= rowFactor * structure.plans[structure.leadRowIndex];
         }
         else{
-            double rowFactor = structure.lastRow[structure.leadColIndex];
+            cpp_dec_float_100 rowFactor = structure.lastRow[structure.leadColIndex];
             for (int j = 0; j < structure.lastRow.count(); ++j){
                 structure.lastRow[j] -= rowFactor * structure.constrCoeffMatrix[structure.leadRowIndex][j];
             }

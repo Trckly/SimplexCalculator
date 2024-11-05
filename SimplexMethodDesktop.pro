@@ -15,18 +15,34 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     simplexclass.cpp \
-    tablebuilder.cpp
+    TableBuilders/simplextablebuilder.cpp \
+    TableBuilders/transportationtablebuilder.cpp \
+    transportpotentialmethod.cpp
 
 HEADERS += \
+    Dialogs/TransportationDialog.h \
     dualsimplexclass.h \
     gomoryclass.h \
     lpmethods.h \
     mainwindow.h \
     simplexclass.h \
-    tablebuilder.h
+    TableBuilders/simplextablebuilder.h \
+    TableBuilders/transportationtablebuilder.h \
+    transportpotentialmethod.h
 
 FORMS += \
     mainwindow.ui
+
+# My MacOS boost library inclusion directory
+INCLUDEPATH += /opt/homebrew/Cellar/boost/1.86.0_1/include
+LIBS += -L/opt/homebrew/Cellar/boost/1.86.0_1/lib -lboost_system -lboost_filesystem
+
+# My Windows boost library inclusion directory
+# INCLUDEPATH += C:/boost_1_86_0
+# LIBS += -LC:/boost_1_86_0/bin/x64/lib
+
+
+
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

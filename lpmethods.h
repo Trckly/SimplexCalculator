@@ -2,27 +2,30 @@
 #define LPMETHODS_H
 
 #include <QObject>
+#include <boost/multiprecision/cpp_dec_float.hpp>
+
+using namespace boost::multiprecision;
 
 struct LpStructure {
-    QVector<double> objFuncCoeffVector;
-    QVector<QVector<double>> constrCoeffMatrix;
+    QVector<cpp_dec_float_100> objFuncCoeffVector;
+    QVector<QVector<cpp_dec_float_100>> constrCoeffMatrix;
     QVector<int> signs;
-    QVector<double> plans;
+    QVector<cpp_dec_float_100> plans;
     int leadRowIndex;
     int leadColIndex;
     QVector<int> baseIndexes;
-    double resultValue;
-    QVector<double> ratio;
-    QVector<double> lastRow;
-    double leadElement;
+    cpp_dec_float_100 resultValue;
+    QVector<cpp_dec_float_100> ratio;
+    QVector<cpp_dec_float_100> lastRow;
+    cpp_dec_float_100 leadElement;
 };
 
 class LPMethod : public QObject
 {
     Q_OBJECT
 public:
-    explicit LPMethod(const QVector<double>& objFuncCoeffVector, const QVector<QVector<double>>& constrCoeffMatrix,
-                       const QVector<int>& signs, const QVector<double>& plans, QObject *parent = nullptr);
+    explicit LPMethod(const QVector<cpp_dec_float_100>& objFuncCoeffVector, const QVector<QVector<cpp_dec_float_100>>& constrCoeffMatrix,
+                       const QVector<int>& signs, const QVector<cpp_dec_float_100>& plans, QObject *parent = nullptr);
 
     LPMethod(const LpStructure& otherStructure);
 
@@ -31,7 +34,7 @@ public:
 protected:
     LpStructure structure;
 
-    double leadingElement;
+    cpp_dec_float_100 leadingElement;
 
 public:
     virtual bool SolveOneStep();

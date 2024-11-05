@@ -1,7 +1,11 @@
+#include <QMessageBox>
 #include "mainwindow.h"
+#include "Dialogs/TransportationDialog.h"
 #include "dualsimplexclass.h"
 #include "gomoryclass.h"
-#include "tablebuilder.h"
+#include "TableBuilders/simplextablebuilder.h"
+#include "TableBuilders/transportationtablebuilder.h"
+#include "transportpotentialmethod.h"
 #include "ui_mainwindow.h"
 
 void clearLayout(QHBoxLayout*);
@@ -12,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->methodComboBox->addItems({"Simplex", "DualSimplex", "Gomory"});
+    ui->methodComboBox->addItems({"Simplex", "DualSimplex", "Gomory", "Transportation(Potentials)"});
 
     ui->coeffCountSpinBox->setMinimum(2);
 
@@ -58,6 +62,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
             QString tableStr = "CT-" + QString::number(nextIndex+1);
             ui->tableLabel->setText(tableStr);
+        }
+        else if (event->key() == Qt::Key_Enter) {
+            on_calculateButton_clicked();
         }
     }
 }
@@ -148,31 +155,31 @@ QVector<int> MainWindow::ConvertSigns()
 // Returns first found invalid input line edit
 QLineEdit* MainWindow::ReadAllInputs()
 {
-    QVector<double> objFuncCoefficients;
+    QVector<cpp_dec_float_100> objFuncCoefficients;
     for (int i = 0; i < objFuncLineEditList.count(); ++i){
         if(objFuncLineEditList[i]->text().isEmpty()){
             objFuncLineEditList[i]->setText("0");
         }
 
         bool ok;
-        double temp = objFuncLineEditList[i]->text().toFloat(&ok);
+        cpp_dec_float_100 temp = objFuncLineEditList[i]->text().toFloat(&ok);
         if(!ok){
             return objFuncLineEditList[i];
         }
         objFuncCoefficients.append(temp);
     }
 
-    QVector<QVector<double>> constraintsCoefficients;
-    QVector<double> plans;
+    QVector<QVector<cpp_dec_float_100>> constraintsCoefficients;
+    QVector<cpp_dec_float_100> plans;
     for(int i = 0; i < constraintsLineEditMatrix.count(); ++i){
-        QVector<double> row;
+        QVector<cpp_dec_float_100> row;
 
         if(planLineEditVect[i]->text().isEmpty()){
             planLineEditVect[i]->setText("0");
         }
 
         bool k;
-        double t = planLineEditVect[i]->text().toFloat(&k);
+        cpp_dec_float_100 t = planLineEditVect[i]->text().toFloat(&k);
         if(!k){
             return planLineEditVect[i];
         }
@@ -184,7 +191,7 @@ QLineEdit* MainWindow::ReadAllInputs()
             }
 
             bool ok;
-            double temp = constraintsLineEditMatrix[i][j]->text().toFloat(&ok);
+            cpp_dec_float_100 temp = constraintsLineEditMatrix[i][j]->text().toFloat(&ok);
             if(!ok){
                 return constraintsLineEditMatrix[i][j];
             }
@@ -212,34 +219,47 @@ QLineEdit* MainWindow::ReadAllInputs()
 
 void MainWindow::on_calculateButton_clicked()
 {
-    tables.clear();
+    // One table means initial input table for transportation problem
+    if(tables.count() > 1)
+        ClearUI();
 
-    if(prevFalseLineEdit){
-        prevFalseLineEdit->setStyleSheet("");
-    }
+    if(currentMethod != PotentialsTransportation) {
+        if(prevFalseLineEdit){
+            prevFalseLineEdit->setStyleSheet("");
+        }
 
-    if(QLineEdit* falseLineEdit = ReadAllInputs()){
-        prevFalseLineEdit = falseLineEdit;
-        prevFalseLineEdit->setStyleSheet("QLineEdit { background-color: red; }");
-        return;
-    }
+        if(QLineEdit* falseLineEdit = ReadAllInputs()){
+            prevFalseLineEdit = falseLineEdit;
+            prevFalseLineEdit->setStyleSheet("QLineEdit { background-color: red; }");
+            return;
+        }
 
-    // Building logic
-    TableBuilder builder(lpMethod);
+        // Building logic
+        SimplexTableBuilder builder(lpMethod);
 
-    int tableCounter = -1;
-    do{
+        int tableCounter = -1;
+        do{
+            tables.append(builder.ConstructTable());
+            if(tableCounter >= 0)
+                builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
+            tableCounter++;
+        }
+        while (!lpMethod->SolveOneStep() && tableCounter <= 10);
+
+        // Last table with solution
         tables.append(builder.ConstructTable());
-        if(tableCounter >= 0)
-            builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
-        tableCounter++;
+        builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
     }
-    while (!lpMethod->SolveOneStep());
-
-    // Last table with solution
-    tables.append(builder.ConstructTable());
-    builder.MarkLeadingElement(tables[tableCounter]); // Mark leading element of previous table
-
+    else if(currentMethod == PotentialsTransportation){
+        if(auto transportationMethod = new TransportPotentialMethod(tables.first())){
+            bool bSolved = false;
+            for (int i = 0; i < 4 || !bSolved; ++i){
+                bSolved = transportationMethod->SolveOneStep();
+                QTableWidget* table = TransportationTableBuilder::ConstructTable(transportationMethod);
+                tables.append(table);
+            }
+        }
+    }
 
     for(int i = 0; i < tables.count(); ++i){
         ui->tablesStackedWidget->addWidget(tables[i]);
@@ -271,17 +291,26 @@ void MainWindow::on_nextTable_clicked()
     ui->tableLabel->setText(tableStr);
 }
 
-void MainWindow::Transpose(QVector<QVector<double>> &vectorToTranspose)
+void MainWindow::Transpose(QVector<QVector<cpp_dec_float_100>> &vectorToTranspose)
 {
-    const QVector<QVector<double>> temp = vectorToTranspose;
+    const QVector<QVector<cpp_dec_float_100>> temp = vectorToTranspose;
     vectorToTranspose.clear();
 
     for (int i = 0; i < temp[0].count(); ++i){
-        QVector<double> row;
+        QVector<cpp_dec_float_100> row;
         for (int j = 0; j < temp.count(); ++j){
             row.append(temp[j][i]);
         }
         vectorToTranspose.append(row);
+    }
+}
+
+void MainWindow::ClearUI()
+{
+    tables.clear();
+    while (ui->tablesStackedWidget->count() > 0) {
+        QWidget* widget = ui->tablesStackedWidget->widget(0);
+        ui->tablesStackedWidget->removeWidget(widget);
     }
 }
 
@@ -296,15 +325,31 @@ void clearLayout(QHBoxLayout* layout) {
     while ((item = layout->takeAt(0)) != nullptr) {
         QWidget* widget = item->widget();
         if (widget) {
-            widget->hide();   // Hide the widget (optional)
-            widget->deleteLater();  // Schedule widget for deletion
+            widget->hide();
+            widget->deleteLater();
         }
-        delete item;  // Delete the layout item
+        delete item;
     }
 }
 
 void MainWindow::on_methodComboBox_currentIndexChanged(int index)
 {
+    ClearUI();
+
     currentMethod = static_cast<Method>(index);
+
+    if(currentMethod == PotentialsTransportation){
+        ClearUI();
+
+        TransportationDialog dialog;
+        dialog.exec();
+        int rows = dialog.getRows();
+        int cols = dialog.getCols();
+
+        QTableWidget* table = TransportationTableBuilder::CreateInitialTable_TEST(rows, cols);
+        tables.append(table);
+
+        ui->tablesStackedWidget->addWidget(table);
+    };
 }
 

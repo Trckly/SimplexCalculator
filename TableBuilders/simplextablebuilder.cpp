@@ -1,15 +1,15 @@
-#include "tablebuilder.h"
+#include "simplextablebuilder.h"
 #include "dualsimplexclass.h"
 #include "gomoryclass.h"
 #include "simplexclass.h"
 
-TableBuilder::TableBuilder(LPMethod* method, QObject *parent)
+SimplexTableBuilder::SimplexTableBuilder(LPMethod* method, QObject *parent)
     : QObject{parent}
 {
     currentMethod = method;
 }
 
-QTableWidget* TableBuilder::ConstructTable()
+QTableWidget* SimplexTableBuilder::ConstructTable()
 {
     const LpStructure& structure = currentMethod->GetAll();
 
@@ -28,6 +28,7 @@ QTableWidget* TableBuilder::ConstructTable()
     }
 
     table->setHorizontalHeaderLabels(currentHeaders);
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     QStringList rowHeaders;
     for (int i = 0; i < table->rowCount(); ++i){
@@ -45,12 +46,12 @@ QTableWidget* TableBuilder::ConstructTable()
             baseStr = "x" + QString::number(structure.baseIndexes[i]);
             c_bStr = QString::number(structure.baseIndexes[i] > structure.objFuncCoeffVector.count()
                                          ? 0
-                                         : structure.objFuncCoeffVector[structure.baseIndexes[i] - 1]);
-            planStr = QString::number(structure.plans[i]);
+                                         : (double)structure.objFuncCoeffVector[structure.baseIndexes[i] - 1]);
+            planStr = QString::number((double)structure.plans[i]);
 
             for (int j = 0; j < tableWidth - initHeaders.count(); ++j){
                 QString conCoeffStr;
-                    conCoeffStr = QString::number(structure.constrCoeffMatrix[i][j]);
+                    conCoeffStr = QString::number((double)structure.constrCoeffMatrix[i][j]);
                 table->setItem(i, j + 3, new QTableWidgetItem(conCoeffStr));
             }
         }
@@ -58,11 +59,11 @@ QTableWidget* TableBuilder::ConstructTable()
         else{
             baseStr = "Q";
             c_bStr = "=";
-            planStr = QString::number(structure.resultValue);
+            planStr = QString::number((double)structure.resultValue);
 
 
             for (int j = 0; j < structure.lastRow.count(); ++j){
-                QString lastRowCoeffStr = QString::number(structure.lastRow[j]);
+                QString lastRowCoeffStr = QString::number((double)structure.lastRow[j]);
                 table->setItem(i, j+3, new QTableWidgetItem(lastRowCoeffStr));
             }
         }
@@ -74,7 +75,7 @@ QTableWidget* TableBuilder::ConstructTable()
     return table;
 }
 
-void TableBuilder::MarkLeadingElement(QTableWidget *tableToMark)
+void SimplexTableBuilder::MarkLeadingElement(QTableWidget *tableToMark)
 {
     if(!tableToMark){
         qDebug() << "tableToMark is null";
@@ -93,7 +94,7 @@ void TableBuilder::MarkLeadingElement(QTableWidget *tableToMark)
     AppendRatio(tableToMark, structure);
 }
 
-void TableBuilder::AppendRatio(QTableWidget* table, const LpStructure& structure)
+void SimplexTableBuilder::AppendRatio(QTableWidget* table, const LpStructure& structure)
 {
     LPMethod* method;
 
@@ -113,7 +114,7 @@ void TableBuilder::AppendRatio(QTableWidget* table, const LpStructure& structure
 
         int j = table->columnCount() - 1;
         for (int i = 0; i < structure.ratio.count(); ++i){
-            table->setItem(i, j, new QTableWidgetItem(QString::number(structure.ratio[i])));
+            table->setItem(i, j, new QTableWidgetItem(QString::number((double)structure.ratio[i])));
         }
     }
 
@@ -125,7 +126,7 @@ void TableBuilder::AppendRatio(QTableWidget* table, const LpStructure& structure
         int offset = initHeaders.count();
         QString ratioStr;
         for (int i = 0; i < structure.ratio.count(); ++i){
-            ratioStr = structure.ratio[i] < 0 ? "-" : QString::number(structure.ratio[i]);
+            ratioStr = structure.ratio[i] < 0 ? "-" : QString::number((double)structure.ratio[i]);
 
             table->setItem(newRowCount - 1, i + offset, new QTableWidgetItem());
 
